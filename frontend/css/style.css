@@ -1,0 +1,137 @@
+:root {
+    --background: hsl(25 15% 12%);
+    --primary-color: hsl(39, 100%, 60%);
+    --secondary-color: hsl(33, 100%, 94%);
+    --text-color: #333;
+    --bg-color: hsl(30 41% 15%);
+    --card-bg: hsl(25 15% 12%);
+    --border-color: #ddd;
+}
+
+*,
+:before,
+:after {
+    box-sizing: border-box;
+    border: 0 solid #e5e7eb;
+}
+
+body {
+    font-family: 'PT Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.img-holder{
+    width: 3rem;
+    height: 3rem;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin: 0;
+    padding: 0 1rem;
+    max-height: 4rem;
+    min-height: 4rem;
+    background: hsla(25, 15%, 12% , 0.4) ;
+    position: relative;
+    color: var(--secondary-color);
+}
+
+.container a {
+    text-decoration: none;
+    color: var(--secondary-color);
+}
+.logo_container a{
+    display: flex;
+    gap: .7rem;
+    align-items: center;
+}
+
+
+.menu_container {
+    width: 100%;
+    max-height: 3rem;
+    display: flex;
+    gap: 1rem;;
+    justify-content: end;
+    align-items: center;
+}
+
+.menu_container .img-btn {
+    cursor: pointer;
+}
+
+.menu_container ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 55%;
+}
+
+.menu_container img {
+    border-radius: 50%;
+}
+
+.sub-menu-container {
+    position: absolute;
+    top: 100%;
+    width: 10rem;
+    right: 1%;
+    background: var(--background);
+    border-radius: 2%;
+}
+
+.sub-menu {
+    padding: 0.5rem 0.4rem;
+    font-size: small;
+    line-height: 1rem;
+}
+
+.sub-menu h3, .sub-menu p {
+    margin-bottom: 0.05rem;
+    margin-top: 0.1rem;
+}
+
+#line {
+    display: block;
+    border: 0.1px solid var(--secondary-color);
+    margin: 0.5rem 0;
+}
+
+.sub-menu-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    padding: .5rem .3rem;
+    border-radius: 2px;
+}
+
+.sub-menu-link:hover {
+    background: var(--primary-color);
+    color: var(--background);
+}
+
+.sub-menu-link p {
+    width: 100%;
+    padding-left: 0.7rem;
+}
+
+.sub-menu-link:hover p{
+    font-weight: bolder;
+}
+
+.sub-menu-link span {
+    font-weight: 25rem;
+    transition: transform 0.2s;
+}
+
+.sub-menu-link:hover span{
+    transform: translateX(5px);
+}

@@ -1,1 +1,2 @@
-pics/
+**node_modules
+.env
