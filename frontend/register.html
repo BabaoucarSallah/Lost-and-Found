@@ -13,12 +13,13 @@
     <link rel="stylesheet" href="./css/fontawesome-6/css/all.css" />
     <link rel="stylesheet" href="./css/normalize.css" />
     <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/register.css">
   </head>
   <body>
     <header>
       <div class="container">
         <div class="logo_container">
-          <a href="../main.html">
+          <a href="../index.html">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -39,5 +40,145 @@
           </a>
         </div>
     </header>
+
+    <main>
+      <div class="form-container">
+        <a href="./index.html" id="title">
+          <h1 class="form-title">Registration</h1>
+        </a>
+        <form id="registrationForm" class="registration-form" novalidate>
+          <!-- Full Name -->
+          <div class="form-group">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              class="form-input"
+              required
+            />
+            <div class="error-message" role="alert"></div>
+          </div>
+  
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              required
+            />
+            <div class="error-message" role="alert"></div>
+          </div>
+  
+          <!-- Password -->
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-input"
+              required
+            />
+            <div class="error-message" role="alert"></div>
+          </div>
+  
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label for="confirmPassword" class="form-label"
+              >Confirm Password</label
+            >
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              class="form-input"
+              required
+            />
+            <div class="error-message" role="alert"></div>
+          </div>
+  
+          <!-- Date of Birth -->
+          <div class="form-group">
+            <label for="dateOfBirth" class="form-label">Date of Birth</label>
+            <input
+              type="date"
+              id="dateOfBirth"
+              name="dateOfBirth"
+              class="form-input"
+              required
+            />
+            <div class="error-message" role="alert"></div>
+          </div>
+  
+          <!-- Telephone -->
+          <div class="form-group">
+            <label for="telephone" class="form-label">Telephone</label>
+            <input
+              type="tel"
+              id="telephone"
+              name="telephone"
+              class="form-input"
+              required
+            />
+            <div class="error-message" role="alert"></div>
+          </div>
+  
+          <!-- Country -->
+          <div class="form-group">
+            <label for="country" class="form-label">Country</label>
+            <select id="country" name="country" class="form-input" required>
+              <option value="">Select Country</option>
+              <option value="GM">The Gambia</option>
+              <option value="SN">Senegal</option>
+              <option value="ML">Mali</option>
+              <option value="GH">Ghana</option>
+              <option value="NG">Nigeria</option>
+              <option value="US">United States</option>
+              <option value="UK">United Kingdom</option>
+              <option value="CA">Canada</option>
+              <option value="AU">Australia</option>
+            </select>
+            <div class="error-message" role="alert"></div>
+          </div>
+  
+          <!-- Terms -->
+          <div class="form-group terms-group">
+            <input
+              type="checkbox"
+              id="terms"
+              name="terms"
+              class="form-checkbox"
+              required
+            />
+            <label for="terms" class="form-label"
+              >I agree to the terms and conditions</label
+            >
+            <div class="error-message" role="alert"></div>
+          </div>
+  
+          <!-- Submit Button -->
+          <button type="submit" class="submit-button" disabled>Register</button>
+        </form>
+
+        <!-- Add this login link section -->
+        <div class="login-link">
+          Already have an account? <a href="login.html">Login here</a>
+        </div>
+  
+        <!-- Success Message (hidden initially) -->
+        <div id="successMessage" class="success-message hidden">
+          <h2 class="success-title">Registration Successful!</h2>
+          <div class="summary-details"></div>
+          <!-- Add this button -->
+          <button id="closeSuccess" class="close-button">Close</button>
+        </div>
+      </div>
+    </main>
+
+    <script src="./js/main.js" type="module"></script>
   </body>
 </html>
