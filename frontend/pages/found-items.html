@@ -100,6 +100,51 @@
       </div>
     </header>
 
+    <main class="found-item-container">
+
+  <section class="form-intro">
+    <h2 class="form-heading">Found Something?</h2>
+    <p class="form-description">If you've found a lost item, please report it below. Your report helps the rightful owner get it back.</p>
+  </section>
+
+  <form class="found-item-form" id="foundItemForm">
+
+    <div class="form-group">
+      <label for="itemName">Item Name</label>
+      <input type="text" id="itemName" name="itemName" placeholder="e.g. Samsung Phone" required>
+    </div>
+
+    <div class="form-group">
+      <label for="itemDescription">Description</label>
+      <textarea id="itemDescription" name="itemDescription" placeholder="Color, brand, any scratches or unique features..." required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="locationFound">Where Did You Find It?</label>
+      <input type="text" id="locationFound" name="locationFound" placeholder="e.g. Kanifing Campus Cafeteria" required>
+    </div>
+
+    <div class="form-group">
+      <label for="dateFound">Date Found</label>
+      <input type="date" id="dateFound" name="dateFound" required>
+    </div>
+
+    <div class="form-group">
+      <label for="contactInfo">Your Contact Info</label>
+      <input type="text" id="contactInfo" name="contactInfo" placeholder="Phone or email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="itemImage">Upload Item Image (optional)</label>
+      <input type="file" id="itemImage" name="itemImage" accept="image/*">
+    </div>
+
+    <button type="submit" class="submit-btn">Submit Found Item</button>
+  </form>
+
+</main>
+
+
     <script src="../js/main.js" type="module"></script>
   </body>
 </html>
