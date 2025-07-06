@@ -55,10 +55,12 @@
               class="form-input"
               required
               autocomplete="username"
+              aria-describedby="email-error"
+              aria-invalid="false"
             />
-            <div class="error-message" role="alert"></div>
+            <div id="email-error" class="error-message" role="alert" aria-live="polite"></div>
           </div>
-  
+          
           <!-- Password -->
           <div class="form-group">
             <label for="password" class="form-label">Password</label>
@@ -70,8 +72,22 @@
               required
               minlength="8"
               autocomplete="current-password"
+              aria-describedby="password-error password-strength"
             />
-            <div class="error-message" role="alert"></div>
+            <div id="password-error" class="error-message" role="alert" aria-live="polite"></div>
+            <div id="password-strength" class="password-strength-meter">
+              <div class="strength-bar"></div>
+              <div class="strength-text"></div>
+              <div class="requirements" style="display: none">
+                Password must contain:
+                <ul>
+                  <li class="req-uppercase">At least 1 uppercase letter</li>
+                  <li class="req-number">At least 1 number</li>
+                  <li class="req-special">At least 1 special character</li>
+                  <li class="req-length">Minimum 8 characters</li>
+                </ul>
+              </div>
+            </div>
           </div>
 
           <!-- Remember Me -->
