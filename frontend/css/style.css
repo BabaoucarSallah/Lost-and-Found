@@ -682,3 +682,27 @@ body {
   text-decoration: underline;
 }
 >>>>>>> 55b6c5ca53e4bb2184154c647f14567a0d133dad
+
+/* Error message styling */
+.server-error,
+#login-error-container {
+    background-color: #ffebee;
+    border-left: 4px solid #f44336;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    color: #d32f2f;
+    display: flex;
+    align-items: center;
+}
+
+.server-error i,
+#login-error-container i {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+.alert-error {
+    display: flex;
+    align-items: center;
+    gap: 8px; }

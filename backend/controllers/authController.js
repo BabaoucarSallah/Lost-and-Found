@@ -2,6 +2,7 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const validatePassword = require('../utils/passwordValidator');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -18,7 +19,11 @@ const createSendToken = (user, statusCode, res) => {
     status: 'success',
     token,
     data: {
-      user,
+      user: {
+        username: user.username,
+        email: user.email,
+        contact_info: user.contact_info,
+      },
     },
     redirectUrl: '/index.html', // Add redirect URL
   });
@@ -35,6 +40,14 @@ exports.register = catchAsync(async (req, res, next) => {
         `Password requirements: ${passwordValidation.errors.join(', ')}`,
         400
       )
+    );
+  }
+
+  // Check if user exists
+  const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+  if (existingUser) {
+    return next(
+      new AppError('User with this email or username already exists', 400)
     );
   }
 

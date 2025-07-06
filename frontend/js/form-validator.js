@@ -54,8 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const errorDiv = document.createElement('div');
     errorDiv.className = 'server-error';
-    errorDiv.textContent = message;
-    registrationForm.insertBefore(errorDiv, registrationForm.firstChild);
+    errorDiv.innerHTML = `
+    <div class="error-content">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>${message}</span>
+    </div>
+  `;
+
+    registrationForm.prepend(errorDiv);
 
     setTimeout(() => {
       errorDiv.remove();
@@ -214,7 +220,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     registrationForm.addEventListener('submit', handleFormSubmit);
-    closeSuccessButton.addEventListener('click', resetForm);
+    closeSuccessButton.addEventListener('click', () => {
+      successMessage.classList.add('hidden');
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 500); // 0.5 second delay for smooth transition
+    });
   };
 
   // Form Submission Handler
@@ -245,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       console.log('Submitting:', formData); // Before fetch
       const response = await fetch(
-        'http://127.0.0.1:5000/api/v1/auth//register',
+        'http://127.0.0.1:5000/api/v1/auth/register',
         {
           method: 'POST',
           headers: {
@@ -260,20 +272,32 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('Response data:', data); // After parsing
 
       if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
+        // Handle known error formats
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        if (data.message) {
+          throw new Error(data.message);
+        }
+        throw new Error('Registration failed');
       }
 
-      // Show success message
-      summaryDetails.innerHTML = `
-                <p><strong>Full Name:</strong> ${data.user.username}</p>
-                <p><strong>Email:</strong> ${data.user.email}</p>
-                <p><strong>Telephone:</strong> ${data.user.contact_info.telephone}</p>
-            `;
-      registrationForm.classList.add('hidden');
-      successMessage.classList.remove('hidden');
+      // Updated success message handling
+      if (data.data && data.data.user) {
+        const user = data.data.user;
+        summaryDetails.innerHTML = `
+            <p><strong>Full Name:</strong> ${user.username}</p>
+            <p><strong>Email:</strong> ${user.email}</p>
+            <p><strong>Telephone:</strong> ${user.contact_info.telephone}</p>
+        `;
+        registrationForm.classList.add('hidden');
+        successMessage.classList.remove('hidden');
+      } else {
+        throw new Error('Unexpected response format from server');
+      }
     } catch (error) {
-      showServerError(error.message);
       console.error('Registration error:', error);
+      showServerError(error.message);
     }
   };
 
