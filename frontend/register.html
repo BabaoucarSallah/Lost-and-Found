@@ -47,13 +47,14 @@
           <h1 class="form-title">Registration</h1>
         </a>
         <form id="registrationForm" class="registration-form" novalidate>
+          <div id="server-error-container" class="server-error hidden"></div>
           <!-- Full Name -->
           <div class="form-group">
             <label for="fullName" class="form-label">Full Name</label>
             <input
               type="text"
               id="fullName"
-              name="fullName"
+              name="username"
               class="form-input"
               required
             />
@@ -101,47 +102,16 @@
             <div class="error-message" role="alert"></div>
           </div>
   
-          <!-- Date of Birth -->
-          <div class="form-group">
-            <label for="dateOfBirth" class="form-label">Date of Birth</label>
-            <input
-              type="date"
-              id="dateOfBirth"
-              name="dateOfBirth"
-              class="form-input"
-              required
-            />
-            <div class="error-message" role="alert"></div>
-          </div>
-  
           <!-- Telephone -->
           <div class="form-group">
             <label for="telephone" class="form-label">Telephone</label>
             <input
               type="tel"
               id="telephone"
-              name="telephone"
+              name="contact_info"
               class="form-input"
               required
             />
-            <div class="error-message" role="alert"></div>
-          </div>
-  
-          <!-- Country -->
-          <div class="form-group">
-            <label for="country" class="form-label">Country</label>
-            <select id="country" name="country" class="form-input" required>
-              <option value="">Select Country</option>
-              <option value="GM">The Gambia</option>
-              <option value="SN">Senegal</option>
-              <option value="ML">Mali</option>
-              <option value="GH">Ghana</option>
-              <option value="NG">Nigeria</option>
-              <option value="US">United States</option>
-              <option value="UK">United Kingdom</option>
-              <option value="CA">Canada</option>
-              <option value="AU">Australia</option>
-            </select>
             <div class="error-message" role="alert"></div>
           </div>
   
@@ -179,6 +149,6 @@
       </div>
     </main>
 
-    <script src="./js/main.js" type="module"></script>
+    <script src="./js/form-validator.js" type="module"></script>
   </body>
 </html>
