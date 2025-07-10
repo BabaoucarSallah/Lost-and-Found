@@ -41,64 +41,59 @@
 
         <nav id="auth-container">
           <ul>
-            <li><a href="./frontend/login.html">Login</a></li>
-            <li><a href="./frontend/register.html">Register</a></li>
+            <li><a href="./frontend/login.html" target="_blank">Login</a></li>
+            <li><a href="./frontend/register.html" target="_blank">Register</a></li>
           </ul>
         </nav>
       </div>
     </header>
 
-    <main class="container-body">
-      <section class="report">
-        <div class="insider">
-          <h1>
-            Reuniting People <br />
-            with Their Belongings
-          </h1>
-          <p>
-            Our community helps return lost items to <br />
-            their owners through a simple and secure <br />
-            platform
-          </p>
-        </div>
-        <div class="report-btn">
-          <button class="lost-item-btn">
-            <a href="#"> Report Lost Item </a>
-          </button>
-          <button class="found-item-btn">
-            <a href="#"> Report Found Item </a>
-          </button>
-        </div>
-      </section>
 
-      <section class="search">
-        <div class="search-items">
-          <h2>Search Items</h2>
-          <hr class="sea" />
-          <br /><br />
-          <input
-            type="text"
-            name="search"
-            placeholder="Search by keyword"
-          /><br /><br />
-          <select name="categories" id="all-categories">
-            <option value="all-categories">All Categories</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Documents">Documents</option>
-            <option value="Jewelry">Jewelry</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Other">Other</option></select
-          ><br /><br />
-          <input
-            type="text"
-            name="location"
-            placeholder="location"
-          /><br /><br />
-          <button class="search-btn">
-            <a href="#">Search</a>
-          </button>
-        </div>
-      </section>
+    <section class="report">
+      <div class="insider">
+        <h1>Reuniting People <br> with Their Belongings</h1>
+        <p>
+          Our community helps return lost items to <br> their owners
+          through a simple and secure <br> platform
+        </p>
+      </div>
+      <div class="report-btn">
+        <button class="lost-item-btn">
+          <a href="./frontend/pages/lost-items.html" target="_blank">
+            Report Lost Item
+          </a>
+        </button>
+        <button class="found-item-btn">
+          <a href="./frontend/pages/found-items.html" target="_blank">
+            Report Found Item
+          </a>
+        </button>
+      </div>
+    </section>
+
+    <section class="search">
+      <div class="search-items">
+        <h2>
+          Search Items
+        </h2>
+        <hr class="sea"><br><br>
+        <input type="text" name="search" placeholder="Search by keyword"><br><br>
+        <select name="categories" id="all-categories">
+          <option value="all-categories">All Categories</option>
+          <option value="Electronics"> Electronics</option>
+          <option value="Documents">Documents</option>
+          <option value="Jewelry">Jewelry</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Other">Other</option>
+        </select><br><br>
+        <input type="text" name="location" placeholder="location"><br><br>
+        <button class="search-btn">
+          <a href="#">Search</a>
+        </button>
+      </div>
+    </section>
+
+    
 
       <section class="recently-lost-items">
         <h2>Recently Lost Items</h2>
