@@ -2,7 +2,6 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
-const validatePassword = require('../utils/passwordValidator');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -19,74 +18,178 @@ const createSendToken = (user, statusCode, res) => {
     status: 'success',
     token,
     data: {
-      user: {
-        username: user.username,
-        email: user.email,
-        contact_info: user.contact_info,
-      },
+      user,
     },
-    redirectUrl: '/index.html', // Add redirect URL
   });
 };
 
 exports.register = catchAsync(async (req, res, next) => {
+  console.log('Auth Controller: Registering user...'); // ADD THIS LOG
   const { username, email, password, contact_info } = req.body;
 
-  // Validate password
-  const passwordValidation = validatePassword(password);
-  if (!passwordValidation.isValid) {
+  // Comprehensive validation with specific error messages
+  if (!username || username.trim().length === 0) {
+    return next(new AppError('Full name is required', 400));
+  }
+
+  if (username.trim().length < 2) {
+    return next(
+      new AppError('Full name must be at least 2 characters long', 400)
+    );
+  }
+
+  if (username.trim().length > 50) {
+    return next(new AppError('Full name cannot exceed 50 characters', 400));
+  }
+
+  if (!email || email.trim().length === 0) {
+    return next(new AppError('Email is required', 400));
+  }
+
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.trim())) {
+    return next(new AppError('Please enter a valid email', 400));
+  }
+
+  if (!password || password.length === 0) {
+    return next(new AppError('Password is required', 400));
+  }
+
+  // Password strength validation
+  if (password.length < 8) {
+    return next(
+      new AppError('Password must be at least 8 characters long', 400)
+    );
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    return next(
+      new AppError('Password must contain at least one uppercase letter', 400)
+    );
+  }
+
+  if (!/[a-z]/.test(password)) {
+    return next(
+      new AppError('Password must contain at least one lowercase letter', 400)
+    );
+  }
+
+  if (!/\d/.test(password)) {
+    return next(new AppError('Password must contain at least one number', 400));
+  }
+
+  if (!/[!@#$%^&*]/.test(password)) {
     return next(
       new AppError(
-        `Password requirements: ${passwordValidation.errors.join(', ')}`,
+        'Password must contain at least one special character (!@#$%^&*)',
         400
       )
     );
   }
 
-  // Check if user exists
-  const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-  if (existingUser) {
-    return next(
-      new AppError('User with this email or username already exists', 400)
-    );
+  // Phone validation (if provided)
+  if (contact_info && contact_info.trim().length > 0) {
+    const phoneRegex = /^[\d\s\-()+]+$/;
+    if (
+      !phoneRegex.test(contact_info.trim()) ||
+      contact_info.trim().length < 7
+    ) {
+      return next(
+        new AppError(
+          'Please enter a valid phone number (minimum 7 digits)',
+          400
+        )
+      );
+    }
   }
 
-  const newUser = await User.create({
-    username,
-    email,
-    password_hash: password,
-    contact_info,
-    role: 'user',
-  });
+  try {
+    const newUser = await User.create({
+      username: username.trim(),
+      email: email.trim().toLowerCase(),
+      password_hash: password,
+      contact_info: contact_info ? contact_info.trim() : '',
+      role: 'user',
+    });
+    console.log('Auth Controller: User created successfully.'); // ADD THIS LOG
+    createSendToken(newUser, 201, res);
+  } catch (err) {
+    console.error('Registration error:', err);
 
-  createSendToken(newUser, 201, res);
+    if (err.code === 11000) {
+      // Duplicate key error
+      const field = Object.keys(err.keyValue)[0];
+      const value = err.keyValue[field];
+
+      if (field === 'email') {
+        return next(
+          new AppError(
+            'This email is already registered. Please use a different email.',
+            409
+          )
+        );
+      } else if (field === 'username') {
+        return next(
+          new AppError(
+            'This name is already taken. Please use a different name.',
+            409
+          )
+        );
+      } else {
+        return next(
+          new AppError(
+            `This ${field} is already taken. Please use a different value.`,
+            409
+          )
+        );
+      }
+    }
+
+    // Handle validation errors
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map((error) => error.message);
+      return next(new AppError(errors.join('. '), 400));
+    }
+
+    next(err); // Pass other errors to the global error handler
+  }
 });
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  // 1) Check if email and password exist
-  if (!email || !password) {
-    return next(new AppError('Please provide email and password!', 400));
+  // 1) Check if email and password exist with specific error messages
+  if (!email || email.trim().length === 0) {
+    return next(new AppError('Email is required', 400));
   }
 
-  // 2) Validate email format
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return next(new AppError('Please provide a valid email address', 400));
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.trim())) {
+    return next(new AppError('Please enter a valid email', 400));
   }
 
-  // 3) Check if user exists
-  const user = await User.findOne({ email }).select('+password_hash');
+  if (!password || password.length === 0) {
+    return next(new AppError('Password is required', 400));
+  }
+
+  // 2) Check if user exists && password is correct
+  const user = await User.findOne({ email: email.trim().toLowerCase() }).select(
+    '+password_hash'
+  );
+
   if (!user) {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  // 4) Check if password is correct
-  if (!(await user.matchPassword(password))) {
+  const isPasswordCorrect = await user.matchPassword(password);
+
+  if (!isPasswordCorrect) {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  // 5) If everything ok, send token to client with redirect
+  // 3) If everything ok, send token to client
   createSendToken(user, 200, res);
 });
 

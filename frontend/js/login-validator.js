@@ -4,180 +4,230 @@ document.addEventListener('DOMContentLoaded', () => {
   const passwordInput = document.getElementById('password');
 
   // Error elements
-  const emailError = emailInput.nextElementSibling;
+  const emailError = document.getElementById('email-error');
   const passwordError = document.getElementById('password-error');
-  const passwordStrength = document.getElementById('password-strength');
-  const strengthBar = passwordStrength.querySelector('.strength-bar');
-  const strengthText = passwordStrength.querySelector('.strength-text');
-  const requirements = passwordStrength.querySelectorAll('.requirements li');
-
-  // Create strength bar fill element
-  const strengthBarFill = document.createElement('div');
-  strengthBarFill.className = 'strength-bar-fill';
-  strengthBar.appendChild(strengthBarFill);
+  const errorContainer = document.getElementById('login-error-container');
+  const loadingOverlay = document.getElementById('loading');
+  const submitButton = document.querySelector('.submit-button');
 
   // Validation patterns
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const hasUpperCase = /[A-Z]/;
-  const hasNumber = /\d/;
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/;
 
-  // Validate on form submission & redirect
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  // Initialize page - ensure all error containers are hidden
+  function initializePage() {
+    // Clear all error containers
+    clearAllErrors();
 
-    let isValid = true;
-    const emailValid = validateEmail();
-    const passwordValid = validatePassword();
+    // Ensure error container is hidden with proper class
+    errorContainer.classList.add('hidden');
+    errorContainer.innerHTML = '';
 
-    if (!emailValid || !passwordValid) {
-      isValid = false;
+    // Clear all field errors
+    if (emailError) {
+      emailError.textContent = '';
+      emailError.style.display = 'none';
     }
-
-    if (isValid) {
-      try {
-        const formData = new FormData(loginForm);
-        const response = await fetch(
-          'http://127.0.0.1:5000/api/v1/auth/login',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(Object.fromEntries(formData)),
-          }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          showServerError(data.message || 'Login failed. Please try again.');
-        } else {
-          // Store the token in localStorage
-          localStorage.setItem('jwt', data.token);
-
-          // Redirect to index.html
-          window.location.href = data.redirectUrl || 'index.html';
-        }
-      } catch (error) {
-        showServerError('Network error. Please try again.');
-      }
-    }
-  });
-
-  // Real-time validation
-  emailInput.addEventListener('input', validateEmail);
-  passwordInput.addEventListener('input', validatePassword);
-
-  function validateEmail() {
-    const email = emailInput.value.trim();
-    if (!email) {
-      showError(emailInput, emailError, 'Email is required');
-      return false;
-    } else if (!emailPattern.test(email)) {
-      showError(emailInput, emailError, 'Please enter a valid email');
-      return false;
-    } else {
-      clearError(emailInput, emailError);
-      return true;
+    if (passwordError) {
+      passwordError.textContent = '';
+      passwordError.style.display = 'none';
     }
   }
 
-  function validatePassword() {
-    const password = passwordInput.value;
+  // Initialize page on load
+  initializePage();
+
+  // Form submission handler
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await handleLogin();
+  });
+
+  // Real-time validation
+  emailInput.addEventListener('blur', validateEmail);
+  passwordInput.addEventListener('blur', validatePassword);
+
+  function validateEmail() {
+    const email = emailInput.value.trim();
     let isValid = true;
-    let strength = 0;
 
-    // Check requirements
-    const hasUpper = hasUpperCase.test(password);
-    const hasNum = hasNumber.test(password);
-    const hasSpecial = hasSpecialChar.test(password);
-    const hasMinLength = password.length >= 8;
+    clearFieldError('email');
 
-    // Update requirement indicators
-    requirements[0].classList.toggle('valid', hasUpper);
-    requirements[1].classList.toggle('valid', hasNum);
-    requirements[2].classList.toggle('valid', hasSpecial);
-    requirements[3].classList.toggle('valid', hasMinLength);
-
-    // Calculate strength
-    if (hasUpper) strength += 25;
-    if (hasNum) strength += 25;
-    if (hasSpecial) strength += 25;
-    if (hasMinLength) strength += 25;
-
-    // Update strength meter
-    strengthBarFill.style.width = `${strength}%`;
-
-    if (strength < 50) {
-      strengthBarFill.style.backgroundColor = '#ff5252';
-      strengthText.textContent = 'Weak Password';
-    } else if (strength < 75) {
-      strengthBarFill.style.backgroundColor = '#ffb74d';
-      strengthText.textContent = 'Moderate Password';
-    } else {
-      strengthBarFill.style.backgroundColor = '#4CAF50';
-      strengthText.textContent = 'Strong Password';
-    }
-
-    // Validate
-    if (!password) {
-      showError(passwordInput, passwordError, 'Password is required');
+    if (!email) {
+      showFieldError('email', 'Email is required');
       isValid = false;
-    } else if (!hasMinLength) {
-      showError(
-        passwordInput,
-        passwordError,
-        'Password must be at least 8 characters'
-      );
+    } else if (!emailPattern.test(email)) {
+      showFieldError('email', 'Please enter a valid email address');
       isValid = false;
-    } else if (!hasUpper || !hasNum || !hasSpecial) {
-      showError(
-        passwordInput,
-        passwordError,
-        'Password must include uppercase, number, and special character'
-      );
-      isValid = false;
-    } else {
-      clearError(passwordInput, passwordError);
     }
 
     return isValid;
   }
 
-  function showError(input, errorElement, message) {
-    input.classList.add('invalid');
-    input.setAttribute('aria-invalid', 'true');
-    errorElement.textContent = message;
-    errorElement.classList.add('show');
+  function validatePassword() {
+    const password = passwordInput.value;
+    let isValid = true;
+
+    clearFieldError('password');
+
+    if (!password) {
+      showFieldError('password', 'Password is required');
+      isValid = false;
+    } else if (password.length < 8) {
+      showFieldError('password', 'Password must be at least 8 characters long');
+      isValid = false;
+    }
+
+    return isValid;
   }
 
-  function clearError(input, errorElement) {
-    input.classList.remove('invalid');
-    input.setAttribute('aria-invalid', 'false');
-    errorElement.textContent = '';
-    errorElement.classList.remove('show');
+  async function handleLogin() {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    // Clear previous errors
+    clearAllErrors();
+
+    // Validate form
+    const emailValid = validateEmail();
+    const passwordValid = validatePassword();
+
+    if (!emailValid || !passwordValid) {
+      return;
+    }
+
+    try {
+      showLoading();
+
+      const response = await fetch('http://localhost:5000/api/v1/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store token
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.data.user));
+
+        // Show success message
+        showSuccess('Login successful! Redirecting...');
+
+        // Redirect based on role
+        setTimeout(() => {
+          if (data.data.user.role === 'admin') {
+            window.location.href = 'admin-dashboard.html';
+          } else {
+            window.location.href = 'index.html';
+          }
+        }, 1500);
+      } else {
+        // Handle specific error cases
+        if (response.status === 401) {
+          showError('Invalid email or password. Please try again.');
+        } else if (response.status === 429) {
+          showError('Too many login attempts. Please try again later.');
+        } else {
+          showError(data.message || 'Login failed. Please try again.');
+        }
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      showError('Network error. Please check your connection and try again.');
+    } finally {
+      hideLoading();
+    }
   }
 
-  function showServerError(message) {
-    // Remove existing messages
-    const existing = document.querySelector('.server-error');
-    if (existing) existing.remove();
-
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'server-error';
-    errorDiv.textContent = message;
-    loginForm.insertBefore(errorDiv, loginForm.firstChild);
+  function showLoading() {
+    loadingOverlay.style.display = 'flex';
+    submitButton.disabled = true;
   }
 
-  function showServerSuccess(message) {
-    // Remove existing messages
-    const existing = document.querySelector('.server-success');
-    if (existing) existing.remove();
+  function hideLoading() {
+    loadingOverlay.style.display = 'none';
+    submitButton.disabled = false;
+  }
 
-    const successDiv = document.createElement('div');
-    successDiv.className = 'server-success';
-    successDiv.textContent = message;
-    loginForm.insertBefore(successDiv, loginForm.firstChild);
+  function clearAllErrors() {
+    clearFieldError('email');
+    clearFieldError('password');
+    errorContainer.innerHTML = '';
+    errorContainer.classList.add('hidden');
+
+    // Clear any pending timeout
+    if (window.errorTimeout) {
+      clearTimeout(window.errorTimeout);
+    }
+  }
+
+  function clearFieldError(fieldId) {
+    const errorElement = document.getElementById(`${fieldId}-error`);
+    if (errorElement) {
+      errorElement.textContent = '';
+      errorElement.style.display = 'none';
+    }
+  }
+
+  function showFieldError(fieldId, message) {
+    const errorElement = document.getElementById(`${fieldId}-error`);
+    if (errorElement) {
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+    }
+  }
+
+  function showError(message) {
+    console.log('showError called with:', message); // Debug log
+    errorContainer.innerHTML = `
+      <div class="error-alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>${message}</span>
+      </div>
+    `;
+    errorContainer.classList.remove('hidden');
+
+    // Clear any existing timeout
+    if (window.errorTimeout) {
+      clearTimeout(window.errorTimeout);
+    }
+
+    // Auto-hide after 5 seconds
+    window.errorTimeout = setTimeout(() => {
+      console.log('Auto-hiding error container'); // Debug log
+      errorContainer.classList.add('hidden');
+    }, 5000);
+  }
+
+  function showSuccess(message) {
+    errorContainer.innerHTML = `
+      <div class="success-alert">
+        <i class="fas fa-check-circle"></i>
+        <span>${message}</span>
+      </div>
+    `;
+    errorContainer.classList.remove('hidden');
+
+    // Clear any existing timeout
+    if (window.errorTimeout) {
+      clearTimeout(window.errorTimeout);
+    }
+
+    // Note: Success messages don't auto-hide since they're usually followed by redirect
+  }
+
+  // Check if user is already logged in
+  const token = localStorage.getItem('token');
+  if (token) {
+    // Optionally verify token and redirect
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.role === 'admin') {
+      window.location.href = 'admin-dashboard.html';
+    } else {
+      window.location.href = 'index.html';
+    }
   }
 });

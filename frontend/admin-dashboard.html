@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Lost & Found</title>
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/admin-dashboard.css" />
+    <link rel="stylesheet" href="css/fontawesome-6/css/all.css" />
+  </head>
+  <body>
+    <div class="admin-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2><i class="fas fa-shield-alt"></i> Admin Panel</h2>
+        </div>
+        <nav class="sidebar-nav">
+          <ul>
+            <li>
+              <a
+                href="#dashboard"
+                class="nav-link active"
+                data-section="dashboard"
+              >
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="#users" class="nav-link" data-section="users">
+                <i class="fas fa-users"></i> Users
+              </a>
+            </li>
+            <li>
+              <a href="#items" class="nav-link" data-section="items">
+                <i class="fas fa-box"></i> Items
+              </a>
+            </li>
+            <li>
+              <a href="#categories" class="nav-link" data-section="categories">
+                <i class="fas fa-tags"></i> Categories
+              </a>
+            </li>
+            <li>
+              <a href="#claims" class="nav-link" data-section="claims">
+                <i class="fas fa-hand-holding"></i> Claims
+              </a>
+            </li>
+            <li>
+              <a href="#messages" class="nav-link" data-section="messages">
+                <i class="fas fa-envelope"></i> Messages
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="sidebar-footer">
+          <button class="btn-logout" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </aside>
+
+      <!-- Sidebar Overlay for Mobile -->
+      <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="admin-header">
+          <div class="header-left">
+            <button class="menu-toggle" onclick="toggleSidebar()">
+              <i class="fas fa-bars"></i>
+            </button>
+            <h1 id="page-title">Dashboard</h1>
+          </div>
+          <div class="header-right">
+            <div class="user-info">
+              <span id="admin-name">Admin User</span>
+              <div class="user-avatar">
+                <i class="fas fa-user-circle"></i>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard" class="content-section active">
+          <div class="stats-grid">
+            <div
+              class="stat-card clickable"
+              data-section="users"
+              onclick="adminDashboard.navigateToSection('users')"
+            >
+              <div class="stat-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="stat-info">
+                <h3 id="total-users">0</h3>
+                <p>Total Users</p>
+              </div>
+            </div>
+            <div
+              class="stat-card clickable"
+              data-section="items"
+              onclick="adminDashboard.navigateToSection('items')"
+            >
+              <div class="stat-icon">
+                <i class="fas fa-box"></i>
+              </div>
+              <div class="stat-info">
+                <h3 id="total-items">0</h3>
+                <p>Total Items</p>
+              </div>
+            </div>
+            <div
+              class="stat-card clickable"
+              data-section="items"
+              data-filter="lost"
+              onclick="adminDashboard.navigateToSection('items', 'lost')"
+            >
+              <div class="stat-icon">
+                <i class="fas fa-search"></i>
+              </div>
+              <div class="stat-info">
+                <h3 id="lost-items">0</h3>
+                <p>Lost Items</p>
+              </div>
+            </div>
+            <div
+              class="stat-card clickable"
+              data-section="items"
+              data-filter="found"
+              onclick="adminDashboard.navigateToSection('items', 'found')"
+            >
+              <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="stat-info">
+                <h3 id="found-items">0</h3>
+                <p>Found Items</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="recent-activity">
+            <h3>Recent Activity</h3>
+            <div class="activity-list" id="recent-activity-list">
+              <!-- Activity items will be populated here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="users" class="content-section">
+          <div class="section-header">
+            <h2>Users Management</h2>
+            <div class="section-actions">
+              <button class="btn btn-primary" onclick="refreshUsers()">
+                <i class="fas fa-sync"></i> Refresh
+              </button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <!-- Users will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Items Section -->
+        <div id="items" class="content-section">
+          <div class="section-header">
+            <h2>Items Management</h2>
+            <div class="section-actions">
+              <select id="item-type-filter" onchange="filterItems()">
+                <option value="">All Types</option>
+                <option value="lost">Lost Items</option>
+                <option value="found">Found Items</option>
+              </select>
+              <button class="btn btn-primary" onclick="refreshItems()">
+                <i class="fas fa-sync"></i> Refresh
+              </button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Image</th>
+                  <th>Title</th>
+                  <th>Type</th>
+                  <th>Category</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th>Reporter</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="items-table-body">
+                <!-- Items will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Categories Section -->
+        <div id="categories" class="content-section">
+          <div class="section-header">
+            <h2>Categories Management</h2>
+            <div class="section-actions">
+              <button class="btn btn-primary" onclick="showAddCategoryModal()">
+                <i class="fas fa-plus"></i> Add Category
+              </button>
+              <button class="btn btn-primary" onclick="refreshCategories()">
+                <i class="fas fa-sync"></i> Refresh
+              </button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Items Count</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="categories-table-body">
+                <!-- Categories will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Claims Section -->
+        <div id="claims" class="content-section">
+          <div class="section-header">
+            <h2>Claims Management</h2>
+            <div class="section-actions">
+              <select id="claim-status-filter" onchange="filterClaims()">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <button class="btn btn-primary" onclick="refreshClaims()">
+                <i class="fas fa-sync"></i> Refresh
+              </button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Item</th>
+                  <th>Claimant</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="claims-table-body">
+                <!-- Claims will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Messages Section -->
+        <div id="messages" class="content-section">
+          <div class="section-header">
+            <h2>Messages Management</h2>
+            <div class="section-actions">
+              <button class="btn btn-primary" onclick="refreshMessages()">
+                <i class="fas fa-sync"></i> Refresh
+              </button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Subject</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="messages-table-body">
+                <!-- Messages will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal for Add/Edit Category -->
+    <div id="category-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="category-modal-title">Add Category</h3>
+          <button class="modal-close" onclick="closeCategoryModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <form id="category-form">
+          <div class="form-group">
+            <label for="category-name">Name:</label>
+            <input type="text" id="category-name" required />
+          </div>
+          <div class="form-group">
+            <label for="category-description">Description:</label>
+            <textarea id="category-description" rows="3"></textarea>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeCategoryModal()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal for Item Details -->
+    <div id="item-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Item Details</h3>
+          <button class="modal-close" onclick="closeItemModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="item-details">
+          <!-- Item details will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for Password Reset -->
+    <div id="password-reset-modal" class="modal secondary-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Reset User Password</h3>
+          <button class="modal-close" onclick="closePasswordResetModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <form id="password-reset-form">
+          <div class="form-group">
+            <label for="reset-user-name">User:</label>
+            <input type="text" id="reset-user-name" readonly />
+          </div>
+          <div class="form-group">
+            <label for="new-password">New Password:</label>
+            <input type="password" id="new-password" required />
+            <div class="password-requirements">
+              <small>Password must contain:</small>
+              <ul>
+                <li>At least 8 characters</li>
+                <li>At least 1 uppercase letter</li>
+                <li>At least 1 lowercase letter</li>
+                <li>At least 1 number</li>
+                <li>At least 1 special character (!@#$%^&*)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="confirm-password">Confirm Password:</label>
+            <input type="password" id="confirm-password" required />
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closePasswordResetModal()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-warning">
+              Reset Password
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal for Role Change -->
+    <div id="role-change-modal" class="modal secondary-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Change User Role</h3>
+          <button class="modal-close" onclick="closeRoleChangeModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <form id="role-change-form">
+          <div class="form-group">
+            <label for="role-change-user-name">User:</label>
+            <input type="text" id="role-change-user-name" readonly />
+          </div>
+          <div class="form-group">
+            <label for="current-role">Current Role:</label>
+            <input type="text" id="current-role" readonly />
+          </div>
+          <div class="form-group">
+            <label for="new-role">New Role:</label>
+            <select id="new-role" required>
+              <option value="">Select Role</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeRoleChangeModal()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-success">Change Role</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- General Alert Modal -->
+    <div id="alert-modal" class="modal tertiary-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="alert-title">Alert</h3>
+          <button class="modal-close" onclick="closeAlertModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p id="alert-message"></p>
+        </div>
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="closeAlertModal()"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- General Confirm Modal -->
+    <div id="confirm-modal" class="modal tertiary-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="confirm-title">Confirm</h3>
+          <button class="modal-close" onclick="closeConfirmModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p id="confirm-message"></p>
+        </div>
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeConfirmModal()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="confirm-ok-btn"
+            onclick="confirmOk()"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Management Modal -->
+    <div id="user-details-modal" class="modal primary-modal">
+      <div class="modal-content modal-large">
+        <div class="modal-header">
+          <h3>User Management</h3>
+          <button
+            class="modal-close"
+            onclick="adminDashboard.closeUserManagementModal()"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="user-management-container">
+            <!-- User Details Section -->
+            <div class="user-details-section">
+              <h4><i class="fas fa-user"></i> User Information</h4>
+              <div id="user-details-content" class="user-details-card">
+                <!-- User details will be populated here -->
+              </div>
+            </div>
+
+            <!-- User Actions Section -->
+            <div class="user-actions-section">
+              <h4><i class="fas fa-tools"></i> User Actions</h4>
+              <div class="action-buttons">
+                <button id="change-role-btn" class="btn btn-success action-btn">
+                  <i class="fas fa-user-cog"></i>
+                  Change Role
+                </button>
+                <button
+                  id="reset-password-btn"
+                  class="btn btn-warning action-btn"
+                >
+                  <i class="fas fa-key"></i>
+                  Reset Password
+                </button>
+                <button id="delete-user-btn" class="btn btn-danger action-btn">
+                  <i class="fas fa-trash"></i>
+                  Delete User
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="adminDashboard.closeUserManagementModal()"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+
+    <script src="js/admin-dashboard.js"></script>
+  </body>
+</html>

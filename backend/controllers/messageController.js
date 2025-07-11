@@ -106,6 +106,95 @@ exports.getConversationWithUser = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get a specific message by ID
+exports.getMessageById = catchAsync(async (req, res, next) => {
+  const message = await Message.findById(req.params.id)
+    .populate('sender', 'username')
+    .populate('receiver', 'username')
+    .populate('item', 'title');
+
+  if (!message) {
+    return next(new AppError('Message not found', 404));
+  }
+
+  // Only sender or receiver can view the message
+  if (
+    message.sender._id.toString() !== req.user.id &&
+    message.receiver._id.toString() !== req.user.id
+  ) {
+    return next(
+      new AppError('You are not authorized to view this message', 403)
+    );
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      message,
+    },
+  });
+});
+
+// Update a message
+exports.updateMessage = catchAsync(async (req, res, next) => {
+  const { content } = req.body;
+
+  const message = await Message.findById(req.params.id);
+
+  if (!message) {
+    return next(new AppError('Message not found', 404));
+  }
+
+  // Only sender can update the message
+  if (message.sender.toString() !== req.user.id) {
+    return next(
+      new AppError('You are not authorized to update this message', 403)
+    );
+  }
+
+  // Update the message content
+  if (content) {
+    message.content = content;
+  }
+
+  await message.save();
+
+  // Populate the updated message
+  await message.populate('sender', 'username');
+  await message.populate('receiver', 'username');
+  await message.populate('item', 'title');
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      message,
+    },
+  });
+});
+
+// Delete a message
+exports.deleteMessage = catchAsync(async (req, res, next) => {
+  const message = await Message.findById(req.params.id);
+
+  if (!message) {
+    return next(new AppError('Message not found', 404));
+  }
+
+  // Only sender can delete the message
+  if (message.sender.toString() !== req.user.id) {
+    return next(
+      new AppError('You are not authorized to delete this message', 403)
+    );
+  }
+
+  await Message.findByIdAndDelete(req.params.id);
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+});
+
 // Mark message as read
 exports.markMessageAsRead = catchAsync(async (req, res, next) => {
   const message = await Message.findById(req.params.id);

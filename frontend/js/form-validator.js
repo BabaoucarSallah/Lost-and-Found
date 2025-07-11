@@ -12,6 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const summaryDetails = successMessage.querySelector('.summary-details');
   const closeSuccessButton = document.getElementById('closeSuccess');
 
+  // Password strength elements
+  const strengthBar = document.querySelector('.strength-bar-fill');
+  const strengthText = document.querySelector('.strength-text');
+  const requirements = document.querySelectorAll('.requirements li');
+
   // Form state
   const formState = {
     fullName: { isValid: false, message: '' },
@@ -71,13 +76,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // Validation Functions
   const validateFullName = () => {
     const value = fullNameInput.value.trim();
-    formState.fullName.isValid = value.length > 0;
-    formState.fullName.message =
-      value.length > 0 ? '' : 'Full name is required';
+    const isValid = value.length >= 2 && value.length <= 50;
 
-    if (!formState.fullName.isValid) {
+    formState.fullName.isValid = isValid;
+
+    if (!isValid) {
+      if (value.length === 0) {
+        formState.fullName.message = 'Full name is required';
+      } else if (value.length < 2) {
+        formState.fullName.message =
+          'Full name must be at least 2 characters long';
+      } else if (value.length > 50) {
+        formState.fullName.message = 'Full name cannot exceed 50 characters';
+      }
       showError(fullNameInput, formState.fullName.message);
     } else {
+      formState.fullName.message = '';
       hideError(fullNameInput);
     }
     return formState.fullName.isValid;
@@ -110,6 +124,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasNumber = /\d/.test(value);
     const hasSpecial = /[!@#$%^&*]/.test(value);
 
+    // Update password strength meter
+    updatePasswordStrength(
+      value,
+      hasMinLength,
+      hasUpper,
+      hasNumber,
+      hasSpecial
+    );
+
     formState.password.isValid =
       hasMinLength && hasUpper && hasLower && hasNumber && hasSpecial;
 
@@ -134,6 +157,74 @@ document.addEventListener('DOMContentLoaded', () => {
     return formState.password.isValid;
   };
 
+  // Password strength meter function
+  const updatePasswordStrength = (
+    password,
+    hasMinLength,
+    hasUpper,
+    hasNumber,
+    hasSpecial
+  ) => {
+    // Clear previous strength styling
+    strengthBar.className = 'strength-bar-fill';
+
+    if (password.length === 0) {
+      strengthBar.style.width = '0%';
+      strengthText.textContent = '';
+      requirements.forEach((req) => req.classList.remove('valid'));
+      return;
+    }
+
+    // Calculate strength score
+    let strength = 0;
+    let strengthLabel = '';
+    let strengthClass = '';
+
+    // Check requirements and update UI
+    const checks = [
+      { condition: hasUpper, element: requirements[0] },
+      { condition: hasNumber, element: requirements[1] },
+      { condition: hasSpecial, element: requirements[2] },
+      { condition: hasMinLength, element: requirements[3] },
+    ];
+
+    checks.forEach((check) => {
+      if (check.condition) {
+        strength++;
+        check.element.classList.add('valid');
+      } else {
+        check.element.classList.remove('valid');
+      }
+    });
+
+    // Update strength indicator based on score
+    switch (strength) {
+      case 0:
+      case 1:
+        strengthLabel = 'Weak';
+        strengthClass = 'weak';
+        break;
+      case 2:
+        strengthLabel = 'Fair';
+        strengthClass = 'fair';
+        break;
+      case 3:
+        strengthLabel = 'Good';
+        strengthClass = 'good';
+        break;
+      case 4:
+        strengthLabel = 'Strong';
+        strengthClass = 'strong';
+        break;
+    }
+
+    // Update strength bar
+    const widthPercentage = (strength / 4) * 100;
+    strengthBar.style.width = `${widthPercentage}%`;
+    strengthBar.classList.add(strengthClass);
+    strengthText.textContent = strengthLabel;
+  };
+
   const validateConfirmPassword = () => {
     const value = confirmPasswordInput.value;
     const passwordValue = passwordInput.value;
@@ -155,18 +246,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const validateTelephone = () => {
     const value = telephoneInput.value.trim();
-    const telRegex = /^[\d\s\-()+]+$/;
 
+    // Allow empty phone (not required)
+    if (value.length === 0) {
+      formState.telephone.isValid = true;
+      formState.telephone.message = '';
+      hideError(telephoneInput);
+      return true;
+    }
+
+    // Phone validation: numbers, spaces, dashes, parentheses, plus signs
+    const telRegex = /^[\d\s\-()+]+$/;
     formState.telephone.isValid = telRegex.test(value) && value.length >= 7;
-    formState.telephone.message = formState.telephone.isValid
-      ? ''
-      : value.length === 0
-      ? 'Telephone is required'
-      : 'Please enter a valid phone number';
 
     if (!formState.telephone.isValid) {
+      formState.telephone.message =
+        'Please enter a valid phone number (minimum 7 digits)';
       showError(telephoneInput, formState.telephone.message);
     } else {
+      formState.telephone.message = '';
       hideError(telephoneInput);
     }
     return formState.telephone.isValid;
@@ -229,6 +327,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  // Initialize password strength meter
+  const initializePasswordStrength = () => {
+    if (strengthBar && strengthText && requirements.length > 0) {
+      strengthBar.style.width = '0%';
+      strengthText.textContent = '';
+      requirements.forEach((req) => req.classList.remove('valid'));
+    }
+  };
+
+  // Initialize the form
+  initializePasswordStrength();
+
   // Form Submission Handler
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -257,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       console.log('Submitting:', formData); // Before fetch
       const response = await fetch(
-        'http://127.0.0.1:5000/api/v1/auth/register',
+        'http://localhost:5000/api/v1/auth/register',
         {
           method: 'POST',
           headers: {

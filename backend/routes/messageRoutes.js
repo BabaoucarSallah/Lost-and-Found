@@ -15,6 +15,9 @@ router.get(
   '/conversation/:participantId',
   messageController.getConversationWithUser
 );
+router.get('/:id', messageController.getMessageById);
+router.patch('/:id', messageController.updateMessage);
+router.delete('/:id', messageController.deleteMessage);
 router.patch('/:id/read', messageController.markMessageAsRead);
 
 module.exports = router;

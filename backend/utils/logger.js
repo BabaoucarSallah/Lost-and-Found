@@ -1,7 +1,7 @@
 const { createLogger, format, transports } = require('winston');
 
 const logger = createLogger({
-  level: 'info',
+  level: process.env.NODE_ENV === 'production' ? 'warn' : 'info',
   format: format.combine(
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.errors({ stack: true }),
@@ -10,19 +10,67 @@ const logger = createLogger({
   ),
   transports: [
     new transports.Console({
-      format: format.combine(format.colorize(), format.simple()),
+      format: format.combine(
+        format.colorize(),
+        format.printf(({ timestamp, level, message, stack }) => {
+          if (stack) {
+            return `${timestamp} ${level}: ${message}\n${stack}`;
+          }
+          return `${timestamp} ${level}: ${message}`;
+        })
+      ),
     }),
-    new transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new transports.File({ filename: 'logs/combined.log' }),
+  ],
+  // Handle logger errors gracefully
+  exceptionHandlers: [
+    new transports.Console({
+      format: format.combine(
+        format.colorize(),
+        format.printf(({ timestamp, level, message, stack }) => {
+          return `${timestamp} ${level}: ${message}\n${stack}`;
+        })
+      ),
+    }),
+  ],
+  rejectionHandlers: [
+    new transports.Console({
+      format: format.combine(
+        format.colorize(),
+        format.printf(({ timestamp, level, message, stack }) => {
+          return `${timestamp} ${level}: ${message}\n${stack}`;
+        })
+      ),
+    }),
   ],
 });
 
-if (process.env.NODE_ENV !== 'production') {
+// Only add file transports in production or when explicitly needed
+if (process.env.NODE_ENV === 'production') {
   logger.add(
-    new transports.Console({
-      format: format.simple(),
+    new transports.File({
+      filename: 'logs/error.log',
+      level: 'error',
+      handleExceptions: true,
+      handleRejections: true,
+    })
+  );
+  logger.add(
+    new transports.File({
+      filename: 'logs/combined.log',
+      handleExceptions: true,
+      handleRejections: true,
     })
   );
 }
 
 module.exports = logger;
+
+// if (process.env.NODE_ENV !== 'production') {
+//   logger.add(
+//     new transports.Console({
+//       format: format.simple(),
+//     })
+//   );
+// }
+
+// module.exports = logger;

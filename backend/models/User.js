@@ -5,10 +5,11 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: [true, 'Username is required'],
+      required: [true, 'Full name is required'],
       unique: true,
       trim: true,
-      minlength: 3,
+      minlength: [2, 'Full name must be at least 2 characters long'],
+      maxlength: [50, 'Full name cannot exceed 50 characters'],
     },
     email: {
       type: String,
@@ -16,17 +17,46 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Please enter a valid email'],
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please enter a valid email'],
     },
     password_hash: {
       type: String,
       required: [true, 'Password is required'],
-      minlength: 6,
+      minlength: [8, 'Password must be at least 8 characters long'],
+      validate: {
+        validator: function (password) {
+          // Only validate on creation or when password is being modified
+          if (!this.isModified('password_hash')) return true;
+
+          // Check for uppercase letter
+          if (!/[A-Z]/.test(password)) return false;
+          // Check for lowercase letter
+          if (!/[a-z]/.test(password)) return false;
+          // Check for number
+          if (!/\d/.test(password)) return false;
+          // Check for special character
+          if (!/[!@#$%^&*]/.test(password)) return false;
+
+          return true;
+        },
+        message:
+          'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)',
+      },
     },
     contact_info: {
       type: String,
       trim: true,
       default: '',
+      validate: {
+        validator: function (phone) {
+          // Allow empty phone (not required)
+          if (!phone || phone.length === 0) return true;
+          // Validate phone format: numbers, spaces, dashes, parentheses, plus signs
+          const phoneRegex = /^[\d\s\-()+]+$/;
+          return phoneRegex.test(phone) && phone.length >= 7;
+        },
+        message: 'Please enter a valid phone number (minimum 7 digits)',
+      },
     },
     role: {
       type: String,

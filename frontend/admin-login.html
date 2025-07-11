@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - Reuniteit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/fontawesome-6/css/all.css" />
+    <link rel="stylesheet" href="./css/normalize.css" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/login.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo_container">
+          <a href="../index.html">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ffb833"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="img-holder"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              ></path>
+              <path d="M12 2.5a5.5 5.5 0 0 1 5.5 5.5c0 2.22-1.2 4.1-3 5"></path>
+              <path d="M12 2.5a5.5 5.5 0 0 0-5.5 5.5c0 2.22 1.2 4.1 3 5"></path>
+            </svg>
+            <h3 style="color: var()">Reuniteit</h3>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="form-container">
+        <h1 class="form-title">
+          <i class="fas fa-shield-alt"></i> Admin Login
+        </h1>
+        <div id="admin-login-error-container" class="hidden"></div>
+        <form id="admin-login-form" class="login-form" novalidate>
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              required
+              autocomplete="username"
+              aria-describedby="email-error"
+              aria-invalid="false"
+            />
+            <div
+              id="email-error"
+              class="error-message"
+              role="alert"
+              aria-live="polite"
+            ></div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-input"
+              required
+              minlength="8"
+              autocomplete="current-password"
+              aria-describedby="password-error"
+            />
+            <div
+              id="password-error"
+              class="error-message"
+              role="alert"
+              aria-live="polite"
+            ></div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="submit-button">
+            <i class="fas fa-sign-in-alt"></i> Login to Admin Panel
+          </button>
+
+          <!-- Back to Main Site Link -->
+          <div class="register-link">
+            <a href="index.html">← Back to Main Site</a>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <div id="loading" class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+
+    <script>
+      class AdminLogin {
+        constructor() {
+          this.baseURL = 'http://localhost:5000/api/v1';
+          this.init();
+        }
+
+        init() {
+          // Check if already logged in
+          const token = localStorage.getItem('token');
+          if (token) {
+            this.checkTokenAndRedirect(token);
+          }
+
+          // Setup form submission
+          document
+            .getElementById('admin-login-form')
+            .addEventListener('submit', (e) => {
+              e.preventDefault();
+              this.handleLogin();
+            });
+        }
+
+        async checkTokenAndRedirect(token) {
+          try {
+            const response = await fetch(`${this.baseURL}/auth/me`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (response.ok) {
+              const userData = await response.json();
+              if (userData.data.user.role === 'admin') {
+                window.location.href = 'admin-dashboard.html';
+              }
+            }
+          } catch (error) {
+            console.error('Token check failed:', error);
+            localStorage.removeItem('token');
+          }
+        }
+
+        async handleLogin() {
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value;
+
+          // Clear previous errors
+          this.clearErrors();
+
+          // Basic validation
+          if (!email || !password) {
+            this.showError('Please fill in all fields');
+            return;
+          }
+
+          if (!this.isValidEmail(email)) {
+            this.showFieldError('email', 'Please enter a valid email address');
+            return;
+          }
+
+          try {
+            this.showLoading();
+
+            const response = await fetch(`${this.baseURL}/auth/login`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              // Check if user is admin
+              if (data.data.user.role !== 'admin') {
+                this.showError('Access denied. Admin privileges required.');
+                return;
+              }
+
+              // Store token and redirect
+              localStorage.setItem('token', data.token);
+              this.showSuccess('Login successful! Redirecting...');
+              setTimeout(() => {
+                window.location.href = 'admin-dashboard.html';
+              }, 1500);
+            } else {
+              this.showError(
+                data.message || 'Login failed. Please check your credentials.'
+              );
+            }
+          } catch (error) {
+            console.error('Login error:', error);
+            this.showError(
+              'Network error. Please check your connection and try again.'
+            );
+          } finally {
+            this.hideLoading();
+          }
+        }
+
+        isValidEmail(email) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(email);
+        }
+
+        showLoading() {
+          document.getElementById('loading').style.display = 'flex';
+          document.querySelector('.submit-button').disabled = true;
+        }
+
+        hideLoading() {
+          document.getElementById('loading').style.display = 'none';
+          document.querySelector('.submit-button').disabled = false;
+        }
+
+        clearErrors() {
+          const errorContainer = document.getElementById(
+            'admin-login-error-container'
+          );
+          const fieldErrors = document.querySelectorAll('.error-message');
+
+          errorContainer.innerHTML = '';
+          errorContainer.classList.add('hidden');
+
+          fieldErrors.forEach((error) => {
+            error.textContent = '';
+          });
+        }
+
+        showFieldError(fieldId, message) {
+          const errorElement = document.getElementById(`${fieldId}-error`);
+          if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+          }
+        }
+
+        showError(message) {
+          const errorContainer = document.getElementById(
+            'admin-login-error-container'
+          );
+          errorContainer.innerHTML = `
+            <div class="error-alert">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>${message}</span>
+            </div>
+          `;
+          errorContainer.classList.remove('hidden');
+
+          // Auto-hide after 5 seconds
+          setTimeout(() => {
+            errorContainer.classList.add('hidden');
+          }, 5000);
+        }
+
+        showSuccess(message) {
+          const errorContainer = document.getElementById(
+            'admin-login-error-container'
+          );
+          errorContainer.innerHTML = `
+            <div class="success-alert">
+              <i class="fas fa-check-circle"></i>
+              <span>${message}</span>
+            </div>
+          `;
+          errorContainer.classList.remove('hidden');
+        }
+      }
+
+      // Initialize when page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        new AdminLogin();
+      });
+    </script>
+
+    <style>
+      .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error-alert {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: #dc3545;
+        color: white;
+        padding: 0.75rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .success-alert {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: #28a745;
+        color: white;
+        padding: 0.75rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      #admin-login-error-container {
+        display: none;
+      }
+
+      #admin-login-error-container:not(.hidden) {
+        display: block;
+      }
+
+      .form-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-title i {
+        color: var(--primary-color);
+      }
+
+      .submit-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .submit-button i {
+        margin-right: 0.5rem;
+      }
+
+      .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: none;
+        min-height: 0;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .error-message:not(:empty) {
+        display: block;
+        opacity: 1;
+      }
+
+      .error-alert {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        background-color: #fee;
+        border: 1px solid #fcc;
+        border-radius: 4px;
+        color: #c33;
+        font-size: 14px;
+      }
+
+      .success-alert {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        background-color: #efe;
+        border: 1px solid #cfc;
+        border-radius: 4px;
+        color: #3c3;
+        font-size: 14px;
+      }
+    </style>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('admin-login-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorContainer = document.getElementById(
+          'admin-login-error-container'
+        );
+        const submitButton = document.querySelector('.submit-button');
+
+        // Check if already logged in as admin
+        const token = localStorage.getItem('token');
+        if (token) {
+          // Verify if user is admin
+          fetch('http://localhost:5000/api/v1/auth/me', {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.data?.user?.role === 'admin') {
+                window.location.href = 'admin-dashboard.html';
+              }
+            })
+            .catch(() => {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+            });
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const email = emailInput.value.trim();
+          const password = passwordInput.value;
+
+          // Clear previous errors
+          errorContainer.innerHTML = '';
+          errorContainer.classList.add('hidden');
+
+          // Basic validation
+          if (!email || !password) {
+            showError('Please fill in all fields');
+            return;
+          }
+
+          try {
+            showLoading();
+
+            const response = await fetch(
+              'http://localhost:5000/api/v1/auth/login',
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+              }
+            );
+
+            const data = await response.json();
+
+            if (response.ok) {
+              // Check if user is admin
+              if (data.data.user.role !== 'admin') {
+                showError(
+                  'Admin access required. Please use admin credentials.'
+                );
+                return;
+              }
+
+              // Store token and user data
+              localStorage.setItem('token', data.token);
+              localStorage.setItem('user', JSON.stringify(data.data.user));
+
+              // Show success message
+              showSuccess(
+                'Login successful! Redirecting to admin dashboard...'
+              );
+
+              // Redirect to admin dashboard
+              setTimeout(() => {
+                window.location.href = 'admin-dashboard.html';
+              }, 1500);
+            } else {
+              // Handle specific error cases
+              if (response.status === 401) {
+                showError('Invalid email or password. Please try again.');
+              } else if (response.status === 429) {
+                showError('Too many login attempts. Please try again later.');
+              } else {
+                showError(data.message || 'Login failed. Please try again.');
+              }
+            }
+          } catch (error) {
+            console.error('Login error:', error);
+            showError(
+              'Network error. Please check your connection and try again.'
+            );
+          } finally {
+            hideLoading();
+          }
+        });
+
+        function showLoading() {
+          submitButton.disabled = true;
+          submitButton.innerHTML =
+            '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+        }
+
+        function hideLoading() {
+          submitButton.disabled = false;
+          submitButton.innerHTML =
+            '<i class="fas fa-sign-in-alt"></i> Login to Admin Panel';
+        }
+
+        function showError(message) {
+          errorContainer.innerHTML = `
+            <div class="error-alert">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>${message}</span>
+            </div>
+          `;
+          errorContainer.classList.remove('hidden');
+
+          // Auto-hide after 5 seconds
+          setTimeout(() => {
+            errorContainer.classList.add('hidden');
+          }, 5000);
+        }
+
+        function showSuccess(message) {
+          errorContainer.innerHTML = `
+            <div class="success-alert">
+              <i class="fas fa-check-circle"></i>
+              <span>${message}</span>
+            </div>
+          `;
+          errorContainer.classList.remove('hidden');
+        }
+      });
+    </script>
+  </body>
+</html>

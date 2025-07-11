@@ -83,8 +83,24 @@
               name="password"
               class="form-input"
               required
+              aria-describedby="password-error password-strength"
             />
             <div class="error-message" role="alert"></div>
+            <div id="password-strength" class="password-strength-meter">
+              <div class="strength-bar">
+                <div class="strength-bar-fill"></div>
+              </div>
+              <div class="strength-text"></div>
+              <div class="requirements">
+                Password must contain:
+                <ul>
+                  <li class="req-uppercase">At least 1 uppercase letter</li>
+                  <li class="req-number">At least 1 number</li>
+                  <li class="req-special">At least 1 special character</li>
+                  <li class="req-length">Minimum 8 characters</li>
+                </ul>
+              </div>
+            </div>
           </div>
   
           <!-- Confirm Password -->
