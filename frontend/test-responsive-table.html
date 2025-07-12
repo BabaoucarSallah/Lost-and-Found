@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responsive Table Test</title>
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/admin-dashboard.css" />
+    <link rel="stylesheet" href="css/fontawesome-6/css/all.css" />
+  </head>
+  <body>
+    <div class="admin-container">
+      <main class="main-content">
+        <div
+          style="padding: 2rem; background-color: var(--bg-color); color: white"
+        >
+          <h1>Responsive Table Test</h1>
+
+          <div class="section-header">
+            <h2>Items Management</h2>
+            <div class="section-actions">
+              <button class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Item
+              </button>
+              <select id="item-type-filter">
+                <option value="">All Types</option>
+                <option value="lost">Lost Items</option>
+                <option value="found">Found Items</option>
+              </select>
+              <button class="btn btn-primary">
+                <i class="fas fa-sync"></i> Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Image</th>
+                  <th>Title</th>
+                  <th>Type</th>
+                  <th>Category</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th>Reporter</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="ID">12345</td>
+                  <td data-label="Image">
+                    <img
+                      src="img/100x100.png"
+                      alt="Lost iPhone"
+                      class="item-image"
+                    />
+                  </td>
+                  <td data-label="Title">Lost iPhone 14</td>
+                  <td data-label="Type">
+                    <span class="status-badge status-lost">lost</span>
+                  </td>
+                  <td data-label="Category">Electronics</td>
+                  <td data-label="Location">Library</td>
+                  <td data-label="Status">
+                    <span class="status-badge status-active">active</span>
+                  </td>
+                  <td data-label="Reporter">John Doe</td>
+                  <td data-label="Date">2025-01-10</td>
+                  <td data-label="Actions" class="actions">
+                    <button class="btn btn-info btn-sm">
+                      <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="btn btn-danger btn-sm">
+                      <i class="fas fa-trash"></i> Delete
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="ID">67890</td>
+                  <td data-label="Image">
+                    <img
+                      src="img/100x100.png"
+                      alt="Found Keys"
+                      class="item-image"
+                    />
+                  </td>
+                  <td data-label="Title">Found Car Keys</td>
+                  <td data-label="Type">
+                    <span class="status-badge status-found">found</span>
+                  </td>
+                  <td data-label="Category">Personal Items</td>
+                  <td data-label="Location">Parking Lot</td>
+                  <td data-label="Status">
+                    <span class="status-badge status-pending">pending</span>
+                  </td>
+                  <td data-label="Reporter">Jane Smith</td>
+                  <td data-label="Date">2025-01-11</td>
+                  <td data-label="Actions" class="actions">
+                    <button class="btn btn-info btn-sm">
+                      <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="btn btn-danger btn-sm">
+                      <i class="fas fa-trash"></i> Delete
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="ID">11111</td>
+                  <td data-label="Image">
+                    <img
+                      src="img/100x100.png"
+                      alt="Lost Wallet"
+                      class="item-image"
+                    />
+                  </td>
+                  <td data-label="Title">Lost Brown Leather Wallet</td>
+                  <td data-label="Type">
+                    <span class="status-badge status-lost">lost</span>
+                  </td>
+                  <td data-label="Category">Personal Items</td>
+                  <td data-label="Location">Cafeteria</td>
+                  <td data-label="Status">
+                    <span class="status-badge status-claimed">claimed</span>
+                  </td>
+                  <td data-label="Reporter">Bob Johnson</td>
+                  <td data-label="Date">2025-01-09</td>
+                  <td data-label="Actions" class="actions">
+                    <button class="btn btn-info btn-sm">
+                      <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="btn btn-danger btn-sm">
+                      <i class="fas fa-trash"></i> Delete
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

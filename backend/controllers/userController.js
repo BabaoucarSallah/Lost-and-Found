@@ -5,7 +5,8 @@ const catchAsync = require('../utils/catchAsync');
 
 // Get all users (Admin only)
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find().select('-password_hash');
+  const users = await User.find({}, '-password_hash').exec();
+
   res.status(200).json({
     status: 'success',
     results: users.length,
@@ -33,18 +34,22 @@ exports.getUser = catchAsync(async (req, res, next) => {
 exports.updateUser = catchAsync(async (req, res, next) => {
   const { username, email, contact_info, role } = req.body;
 
-  const user = await User.findByIdAndUpdate(
-    req.params.id,
-    { username, email, contact_info, role }, // Be careful what fields you allow admin to update
-    {
-      new: true,
-      runValidators: true,
-    }
-  ).select('-password_hash');
+  // Build update object with only provided fields
+  const updateData = {};
+  if (username !== undefined) updateData.username = username;
+  if (email !== undefined) updateData.email = email;
+  if (contact_info !== undefined) updateData.contact_info = contact_info;
+  if (role !== undefined) updateData.role = role;
+
+  const user = await User.findByIdAndUpdate(req.params.id, updateData, {
+    new: true,
+    runValidators: true,
+  }).select('-password_hash');
 
   if (!user) {
     return next(new AppError('User not found', 404));
   }
+
   res.status(200).json({
     status: 'success',
     data: {

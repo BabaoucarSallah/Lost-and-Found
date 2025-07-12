@@ -174,6 +174,69 @@ exports.updateClaimStatus = catchAsync(async (req, res, next) => {
   });
 });
 
+// General update claim function for admins
+exports.updateClaim = catchAsync(async (req, res, next) => {
+  const { status, evidence, contact_info } = req.body;
+
+  // Validate status if provided
+  if (status && !['pending', 'approved', 'rejected'].includes(status)) {
+    return next(
+      new AppError(
+        'Invalid claim status. Must be "pending", "approved", or "rejected".',
+        400
+      )
+    );
+  }
+
+  const claim = await Claim.findById(req.params.id).populate('item');
+
+  if (!claim) {
+    return next(new AppError('Claim not found', 404));
+  }
+
+  // Authorization: Only admin can make general updates
+  if (req.user.role !== 'admin') {
+    return next(
+      new AppError('You are not authorized to update this claim', 403)
+    );
+  }
+
+  // Build update object
+  const updateData = {};
+  if (status) updateData.status = status;
+  if (evidence !== undefined) updateData.evidence = evidence;
+  if (contact_info !== undefined) updateData.contact_info = contact_info;
+
+  // Update the claim
+  const updatedClaim = await Claim.findByIdAndUpdate(
+    req.params.id,
+    updateData,
+    { new: true, runValidators: true }
+  ).populate('item claimer_user');
+
+  // Handle item status changes if claim status is updated
+  if (status) {
+    if (status === 'approved') {
+      claim.item.status = 'returned';
+      claim.item.claimed_by_user = claim.claimer_user;
+      claim.item.claimed_at = Date.now();
+      await claim.item.save({ validateBeforeSave: false });
+    } else if (status === 'rejected' && claim.item.status === 'pending') {
+      claim.item.status = 'active';
+      claim.item.claimed_by_user = null;
+      claim.item.claimed_at = null;
+      await claim.item.save({ validateBeforeSave: false });
+    }
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      claim: updatedClaim,
+    },
+  });
+});
+
 // Delete a claim (Admin or Claimer if pending)
 exports.deleteClaim = catchAsync(async (req, res, next) => {
   const claim = await Claim.findById(req.params.id);
