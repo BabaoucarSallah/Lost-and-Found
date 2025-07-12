@@ -1,55 +1,32 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const connectDB = require('./config/db');
-const morgan = require('morgan');
-const cors = require('cors');
-const { notFound, errorHandler } = require('./middlewares/errorHandler');
-const logger = require('./utils/logger');
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const itemRoutes = require("./routes/itemRoutes");
+const db = require("./config/db");
 
-// Load env vars
+// Load environment variables from .env
 dotenv.config();
-
-// Connect to database
-connectDB();
 
 const app = express();
 
 // Middleware
-app.use(express.json()); // Body parser for JSON
-app.use(express.urlencoded({ extended: true })); // Body parser for URL-encoded data
-app.use(cors()); // Enable CORS
-app.use(morgan('dev')); // HTTP request logger
+app.use(cors()); // allows frontend requests
+app.use(express.json()); // parses JSON request bodies
 
-// Serve static files (especially for uploaded images)
-// This makes files in 'public' directory accessible via '/public' URL path
-app.use('/public', express.static('public')); // This means: anything in 'public' folder will be available under /public URL path
+// Routes
+app.use("/api", itemRoutes);
 
-app.get('/', (req, res) => {
-  res.send('API is running...');
+// Root route (optional test)
+app.get("/", (req, res) => {
+  res.send("Lost and Found API is running ✅");
 });
 
-// ---Routes ---
-const authRoutes = require('./routes/authRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
-const itemRoutes = require('./routes/itemRoutes');
-const claimRoutes = require('./routes/claimRoutes');
-const messageRoutes = require('./routes/messageRoutes');
-const userRoutes = require('./routes/userRoutes'); // Admin routes
+const foundItemRoutes = require("./routes/foundItemRoutes");
+app.use("/api", foundItemRoutes);
 
-// Mount Routers
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/categories', categoryRoutes);
-app.use('/api/v1/items', itemRoutes);
-app.use('/api/v1/claims', claimRoutes); // Optional
-app.use('/api/v1/messages', messageRoutes); // Optional
-app.use('/api/v1/users', userRoutes); // Admin panel user management
 
-// Error Handling Middleware
-app.use(notFound);
-app.use(errorHandler);
-
+// Server start
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

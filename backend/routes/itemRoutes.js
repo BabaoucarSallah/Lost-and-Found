@@ -1,21 +1,12 @@
-const express = require('express');
-const itemController = require('../controllers/itemController');
-const { protect, authorize } = require('../middlewares/authMiddleware');
-const { uploadItemImage } = require('../middlewares/uploadMiddleware'); // For image uploads
-
+const express = require("express");
 const router = express.Router();
 
-router
-  .route('/')
-  .get(itemController.getAllItems) // Publicly accessible to view
-  .post(protect, uploadItemImage, itemController.createItem); // Authenticated users can create
+const { createLostItem, getAllLostItems } = require("../controllers/itemController");
 
-router
-  .route('/:id')
-  .get(itemController.getItem)
-  .patch(protect, uploadItemImage, itemController.updateItem) // Owner or admin
-  .delete(protect, itemController.deleteItem); // Owner or admin
+// Submit new lost item
+router.post("/lost-items", createLostItem);
 
-router.get('/:itemId/matches', itemController.suggestMatches); // Public or authenticated
+// Get all lost items
+router.get("/lost-items", getAllLostItems);
 
 module.exports = router;
