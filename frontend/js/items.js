@@ -247,6 +247,12 @@ function createItemCard(item) {
   const typeBadgeClass = item.type === 'lost' ? 'lost' : 'found';
   const dateField = item.type === 'lost' ? 'date_lost' : 'date_found';
 
+  // Get current user from localStorage if available
+  const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const isOwner =
+    currentUser.id && item.user && currentUser.id === item.user._id;
+  const isActive = item.status === 'active';
+
   return `
         <article class="item-card" data-item-id="${
           item._id
@@ -290,11 +296,27 @@ function createItemCard(item) {
                 <span class="category-tag">${
                   item.category?.name || 'Uncategorized'
                 }</span>
-                <button class="contact-btn" onclick="event.stopPropagation(); contactOwner('${
-                  item._id
-                }')">
-                    Contact Owner
-                </button>
+                ${
+                  !isActive
+                    ? '<span class="status-badge pending">Pending Claims</span>'
+                    : ''
+                }
+                <div class="item-actions">
+                    ${
+                      !isOwner && isActive
+                        ? `
+                        <button class="claim-btn" onclick="event.stopPropagation(); openClaimModal('${item._id}')">
+                            Claim Item
+                        </button>
+                    `
+                        : ''
+                    }
+                    <button class="contact-btn" onclick="event.stopPropagation(); contactOwner('${
+                      item._id
+                    }')">
+                        Contact Owner
+                    </button>
+                </div>
             </div>
         </article>
     `;
@@ -408,6 +430,12 @@ function displayItemModal(item) {
   const typeBadgeClass = item.type === 'lost' ? 'lost' : 'found';
   const dateField = item.type === 'lost' ? 'date_lost' : 'date_found';
 
+  // Get current user from localStorage if available
+  const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const isOwner =
+    currentUser.id && item.user && currentUser.id === item.user._id;
+  const isActive = item.status === 'active';
+
   modalBody.innerHTML = `
         <div class="modal-item-header">
             <span class="item-type-badge ${typeBadgeClass}">
@@ -452,6 +480,16 @@ function displayItemModal(item) {
             </div>
             
             <div class="modal-actions">
+                ${
+                  !isOwner && isActive
+                    ? `
+                    <button class="claim-btn" onclick="openClaimModal('${item._id}')">
+                        <i class="fa-solid fa-hand-holding"></i>
+                        Claim Item
+                    </button>
+                `
+                    : ''
+                }
                 <button class="contact-btn" onclick="contactOwner('${
                   item._id
                 }')">
@@ -475,6 +513,125 @@ function contactOwner(itemId) {
   // This would typically open a contact form or messaging system
   console.log('Contact owner for item:', itemId);
   alert('Contact functionality would be implemented here');
+}
+
+// Claim item functionality
+function openClaimModal(itemId) {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    alert('Please login to claim an item');
+    window.location.href = '../login.html';
+    return;
+  }
+
+  // Create claim modal
+  const modal = document.createElement('div');
+  modal.className = 'modal claim-modal';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Claim Item</h2>
+        <button class="modal-close" onclick="closeClaimModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="claim-form">
+          <div class="form-group">
+            <label for="claim-details">Why do you believe this item is yours?</label>
+            <textarea 
+              id="claim-details" 
+              name="claimDetails" 
+              required 
+              placeholder="Please provide details that prove this item belongs to you (e.g., unique features, purchase location, when you lost it, etc.)"
+              maxlength="500"
+              rows="5"
+            ></textarea>
+            <small class="char-count">0/500 characters</small>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="closeClaimModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Submit Claim</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  modal.style.display = 'flex';
+
+  // Add form submission handler
+  const form = document.getElementById('claim-form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitClaim(itemId, form.claimDetails.value);
+  });
+
+  // Add character counter
+  const textarea = document.getElementById('claim-details');
+  const charCount = document.querySelector('.char-count');
+  textarea.addEventListener('input', () => {
+    const count = textarea.value.length;
+    charCount.textContent = `${count}/500 characters`;
+    charCount.style.color = count > 450 ? '#ff6b6b' : '#666';
+  });
+}
+
+function closeClaimModal() {
+  const modal = document.querySelector('.claim-modal');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+async function submitClaim(itemId, claimDetails) {
+  const token = localStorage.getItem('token');
+
+  if (!claimDetails.trim()) {
+    alert('Please provide claim details');
+    return;
+  }
+
+  try {
+    const submitBtn = document.querySelector('#claim-form .btn-primary');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+
+    const response = await fetch('http://localhost:5000/api/v1/claims', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        itemId: itemId,
+        claimDetails: claimDetails.trim(),
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(
+        'Claim submitted successfully! The item owner will review your claim.'
+      );
+      closeClaimModal();
+      // Optionally reload items to show updated status
+      loadItems();
+    } else {
+      throw new Error(data.message || 'Failed to submit claim');
+    }
+  } catch (error) {
+    console.error('Error submitting claim:', error);
+    alert(error.message || 'Error submitting claim. Please try again.');
+
+    // Re-enable submit button
+    const submitBtn = document.querySelector('#claim-form .btn-primary');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Claim';
+    }
+  }
 }
 
 // Add keyboard navigation for item cards
@@ -543,14 +700,248 @@ const modalStyles = `
     display: flex;
     gap: 1rem;
     margin-top: 1.5rem;
+    flex-wrap: wrap;
 }
 
-.modal-actions .contact-btn {
+.modal-actions .contact-btn,
+.modal-actions .claim-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.modal-actions .contact-btn {
+    background: var(--primary-color, #ffb833);
+    color: white;
+}
+
+.modal-actions .contact-btn:hover {
+    background: #e6a829;
+    transform: translateY(-1px);
+}
+
+.modal-actions .claim-btn {
+    background: #28a745;
+    color: white;
+}
+
+.modal-actions .claim-btn:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+/* Claim Modal Styles */
+.claim-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.claim-modal .modal-content {
+    background: white;
+    border-radius: 10px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.claim-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.claim-modal .modal-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.4rem;
+}
+
+.claim-modal .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.claim-modal .modal-close:hover {
+    color: #333;
+}
+
+.claim-modal .modal-body {
+    padding: 1.5rem;
+}
+
+.claim-modal .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.claim-modal .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.claim-modal .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 120px;
+    box-sizing: border-box;
+}
+
+.claim-modal .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color, #ffb833);
+    box-shadow: 0 0 0 3px rgba(255, 184, 51, 0.1);
+}
+
+.claim-modal .char-count {
+    display: block;
+    text-align: right;
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.claim-modal .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.claim-modal .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    background: #f8f9fa;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.claim-modal .btn-secondary:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.claim-modal .btn-primary {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color, #ffb833);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.claim-modal .btn-primary:hover {
+    background: #e6a829;
+    transform: translateY(-1px);
+}
+
+.claim-modal .btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Item Footer Styles */
+.item-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.item-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.claim-btn {
+    padding: 0.5rem 1rem;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.claim-btn:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.pending {
+    background: #ffc107;
+    color: #212529;
+}
+
+@media (max-width: 768px) {
+    .item-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .item-actions {
+        justify-content: center;
+    }
+    
+    .claim-btn, .contact-btn {
+        flex: 1;
+        min-width: 0;
+    }
 }
 `;
 
