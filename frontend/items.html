@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browse Items - Lost and Found</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/fontawesome-6/css/all.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=PT+Sans:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo_container">
+          <a href="index.html">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ffb833"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="img-holder"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              ></path>
+              <path d="M12 2.5a5.5 5.5 0 0 1 5.5 5.5c0 2.22-1.2 4.1-3 5"></path>
+              <path d="M12 2.5a5.5 5.5 0 0 0-5.5 5.5c0 2.22 1.2 4.1 3 5"></path>
+            </svg>
+            <h3>Reuniteit</h3>
+          </a>
+        </div>
+
+        <nav class="menu_container">
+          <ul class="nav-links">
+            <li>
+              <a href="admin-dashboard.html" class="admin-link hidden"
+                >Admin Dashboard</a
+              >
+            </li>
+            <li><a href="items.html" class="active">Items</a></li>
+          </ul>
+          <img
+            class="img-holder img-btn"
+            alt="User Profile Picture"
+            src="img/100x100.png"
+            id="menu-link"
+          />
+
+          <div class="sub-menu-container" id="Sub-menu-wrap">
+            <div class="sub-menu">
+              <div class="user-info">
+                <h3 id="user-info-name">Loading...</h3>
+                <p id="user-info-email">Loading...</p>
+              </div>
+              <span id="line"></span>
+              <a href="pages/lost-items.html" class="sub-menu-link">
+                <i class="fa-solid fa-circle-plus fill"></i>
+                <p>Post Lost Item</p>
+                <span>></span>
+              </a>
+              <a href="pages/found-items.html" class="sub-menu-link">
+                <i class="fa-solid fa-circle-plus fill"></i>
+                <p>Post Found Item</p>
+                <span>></span>
+              </a>
+              <span id="line"></span>
+              <a href="#" class="sub-menu-link">
+                <i class="fa-solid fa-user"></i>
+                <p>Profile</p>
+                <span>></span>
+              </a>
+              <a href="pages/my-listings.html" class="sub-menu-link">
+                <i class="fa-solid fa-list-squares"></i>
+                <p>My Listings</p>
+                <span>></span>
+              </a>
+              <a
+                href="admin-login.html"
+                class="sub-menu-link admin-link hidden"
+              >
+                <i class="fa-solid fa-shield-halved"></i>
+                <p>Admin Panel</p>
+                <span>></span>
+              </a>
+              <span id="line"></span>
+              <a href="#" class="sub-menu-link logout-btn">
+                <i class="fa-solid fa-sign-out"></i>
+                <p>Log out</p>
+                <span>></span>
+              </a>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="items-container">
+        <!-- Page Header -->
+        <div class="page-header">
+          <h1>Browse Lost & Found Items</h1>
+          <p>Search and filter through reported lost and found items</p>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+          <!-- Search Bar -->
+          <div class="search-bar">
+            <div class="search-input-group">
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Search items..."
+                aria-label="Search items"
+              />
+              <button
+                type="button"
+                id="search-btn"
+                class="search-btn"
+                aria-label="Search"
+              >
+                <i class="fa-solid fa-search"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Controls -->
+          <div class="filter-controls">
+            <button
+              type="button"
+              id="filter-toggle"
+              class="filter-toggle"
+              aria-expanded="false"
+            >
+              <i class="fa-solid fa-filter"></i>
+              <span>Filters</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+
+            <div class="sort-control">
+              <label for="sort-select">Sort by:</label>
+              <select id="sort-select" aria-label="Sort items">
+                <option value="-createdAt">Newest First</option>
+                <option value="createdAt">Oldest First</option>
+                <option value="-date_lost_or_found">
+                  Date Lost/Found (Recent)
+                </option>
+                <option value="date_lost_or_found">
+                  Date Lost/Found (Oldest)
+                </option>
+                <option value="title">Title A-Z</option>
+                <option value="-title">Title Z-A</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Filter Panel -->
+          <div class="filter-panel" id="filter-panel">
+            <div class="filter-content">
+              <h3>Filter Items</h3>
+
+              <div class="filter-group">
+                <label for="type-filter">Item Type:</label>
+                <select id="type-filter">
+                  <option value="">All Types</option>
+                  <option value="lost">Lost Items</option>
+                  <option value="found">Found Items</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="category-filter">Category:</label>
+                <select id="category-filter">
+                  <option value="">All Categories</option>
+                  <!-- Categories will be loaded dynamically -->
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="location-filter">Location:</label>
+                <input
+                  type="text"
+                  id="location-filter"
+                  placeholder="Enter location..."
+                />
+              </div>
+
+              <div class="filter-group">
+                <label for="date-from">Date From:</label>
+                <input type="date" id="date-from" />
+              </div>
+
+              <div class="filter-group">
+                <label for="date-to">Date To:</label>
+                <input type="date" id="date-to" />
+              </div>
+
+              <div class="filter-actions">
+                <button
+                  type="button"
+                  id="apply-filters"
+                  class="btn btn-primary"
+                >
+                  Apply Filters
+                </button>
+                <button
+                  type="button"
+                  id="clear-filters"
+                  class="btn btn-secondary"
+                >
+                  Clear All
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section">
+          <div class="results-header">
+            <div class="results-count" id="results-count">Loading...</div>
+          </div>
+
+          <!-- Items Grid -->
+          <div class="items-grid" id="items-grid">
+            <!-- Items will be loaded here -->
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination hidden" id="pagination">
+            <button
+              type="button"
+              id="prev-page"
+              class="pagination-btn"
+              aria-label="Previous page"
+            >
+              <i class="fa-solid fa-chevron-left"></i>
+              Previous
+            </button>
+            <span class="pagination-info" id="pagination-info"
+              >Page 1 of 1</span
+            >
+            <button
+              type="button"
+              id="next-page"
+              class="pagination-btn"
+              aria-label="Next page"
+            >
+              Next
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Item Detail Modal -->
+    <div class="modal" id="item-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modal-title">Item Details</h2>
+          <button
+            type="button"
+            id="modal-close"
+            class="modal-close"
+            aria-label="Close modal"
+          >
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body" id="modal-body">
+          <!-- Item details will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>Lost & Found</h3>
+            <p>Helping you reunite with your lost items</p>
+          </div>
+          <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="items.html">Browse Items</a></li>
+              <li><a href="pages/lost-items.html">Report Lost</a></li>
+              <li><a href="pages/found-items.html">Report Found</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Contact</h4>
+            <p>Email: info@lostandfound.com</p>
+            <p>Phone: (555) 123-4567</p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 Lost & Found. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/items.js"></script>
+  </body>
+</html>

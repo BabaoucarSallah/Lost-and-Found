@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reuniteit</title>
+    <title>My Listings - Reuniteit</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -51,55 +51,55 @@
           </ul>
           <img
             class="img-holder img-btn"
-            alt="Jane Doe"
+            alt="User Profile Picture"
             src="../img/100x100.png"
             id="menu-link"
           />
-
           <div class="sub-menu-container" id="Sub-menu-wrap">
             <div class="sub-menu">
               <div class="user-info">
-                <h3 id="user-info-name">Jane Doe</h3>
-                <p id="user-info-email">jane.doe@example.com</p>
-              </div>              <span id="line"></span>
+                <h3 id="user-info-name">Loading...</h3>
+                <p id="user-info-email">Loading...</p>
+              </div>
+              <span id="line"></span>
               <a href="items.html" class="sub-menu-link mobile-only">
                 <i class="fa-solid fa-list"></i>
                 <p>Items</p>
                 <span>></span>
               </a>
-
               <span id="line"></span>
-
               <a href="lost-items.html" class="sub-menu-link">
                 <i class="fa-solid fa-circle-plus fill"></i>
                 <p>Post Lost Item</p>
                 <span>></span>
               </a>
-
               <a href="found-items.html" class="sub-menu-link">
                 <i class="fa-solid fa-circle-plus fill"></i>
                 <p>Post Found Item</p>
                 <span>></span>
               </a>
-
               <span id="line"></span>
-
               <a href="#" class="sub-menu-link">
                 <i class="fa-solid fa-user"></i>
                 <p>Profile</p>
                 <span>></span>
               </a>
-
-              <a href="my-listings.html" class="sub-menu-link">
+              <a href="my-listings.html" class="sub-menu-link active">
                 <i class="fa-solid fa-list-squares"></i>
                 <p>My Listings</p>
                 <span>></span>
               </a>
-
+              <a
+                href="../admin-login.html"
+                class="sub-menu-link admin-link hidden"
+              >
+                <i class="fa-solid fa-shield-halved"></i>
+                <p>Admin Panel</p>
+                <span>></span>
+              </a>
               <span id="line"></span>
-
-              <a href="#" class="sub-menu-link">
-                <i class="fa-solid fa-sign-out logout-btn"></i>
+              <a href="#" class="sub-menu-link logout-btn">
+                <i class="fa-solid fa-sign-out"></i>
                 <p>Log out</p>
                 <span>></span>
               </a>
@@ -108,75 +108,65 @@
         </nav>
       </div>
     </header>
+    <main>
+      <section class="my-listings-section">
+        <div class="listings-container">
+          <h1>My Listings</h1>
+          <div class="listings-tabs" role="tablist">
+            <button
+              class="tab-btn active"
+              data-tab="lost"
+              role="tab"
+              aria-selected="true"
+              aria-controls="lost-tab"
+            >
+              Lost Items
+            </button>
+            <button
+              class="tab-btn"
+              data-tab="found"
+              role="tab"
+              aria-selected="false"
+              aria-controls="found-tab"
+            >
+              Found Items
+            </button>
+          </div>
 
-    <main class="found-item-container">
-      <section class="form-intro">
-        <h2 class="form-heading">Found Something?</h2>
-        <p class="form-description">
-          If you've found a lost item, please report it below. Your report helps
-          the rightful owner get it back.
-        </p>
+          <div class="listings-content">
+            <div
+              class="tab-content active"
+              id="lost-tab"
+              role="tabpanel"
+              aria-labelledby="lost-tab"
+            >
+              <h2>Your Lost Items</h2>
+              <div class="listings-grid" id="lost-items-grid">
+                <div class="loading" role="status" aria-live="polite">
+                  Loading your lost items...
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="tab-content"
+              id="found-tab"
+              role="tabpanel"
+              aria-labelledby="found-tab"
+            >
+              <h2>Your Found Items</h2>
+              <div class="listings-grid" id="found-items-grid">
+                <div class="loading" role="status" aria-live="polite">
+                  Loading your found items...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
-
-      <form class="found-item-form" id="foundItemForm">
-        <div class="form-group">
-          <label for="itemName">Item Name</label>
-          <input
-            type="text"
-            id="itemName"
-            name="itemName"
-            placeholder="e.g. Samsung Phone"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="itemDescription">Description</label>
-          <textarea
-            id="itemDescription"
-            name="itemDescription"
-            placeholder="Color, brand, any scratches or unique features..."
-            required
-          ></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="locationFound">Where Did You Find It?</label>
-          <input
-            type="text"
-            id="locationFound"
-            name="locationFound"
-            placeholder="e.g. Kanifing Campus Cafeteria"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="dateFound">Date Found</label>
-          <input type="date" id="dateFound" name="dateFound" required />
-        </div>
-
-        <div class="form-group">
-          <label for="contactInfo">Your Contact Info</label>
-          <input
-            type="text"
-            id="contactInfo"
-            name="contactInfo"
-            placeholder="Phone or email"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="itemImage">Upload Item Image (optional)</label>
-          <input type="file" id="itemImage" name="itemImage" accept="image/*" />
-        </div>
-
-        <button type="submit" class="submit-btn">Submit Found Item</button>
-      </form>
     </main>
 
-    <script src="../js/utils.js"></script>
-    <script src="../js/main.js" type="module"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/my-listings.js"></script>
   </body>
 </html>

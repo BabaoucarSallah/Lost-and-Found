@@ -36,16 +36,19 @@
               <path d="M12 2.5a5.5 5.5 0 0 1 5.5 5.5c0 2.22-1.2 4.1-3 5"></path>
               <path d="M12 2.5a5.5 5.5 0 0 0-5.5 5.5c0 2.22 1.2 4.1 3 5"></path>
             </svg>
-            <h3 style="color: var()">Reuniteit</h3>
+            <h3>Reuniteit</h3>
           </a>
         </div>
 
         <nav class="menu_container">
-          <ul style="display: none">
-            <li><a href="pages/lost-item.html">Lost Items</a></li>
-            <li><a href="pages/found-item.html">Found Items</a></li>
+          <ul class="nav-links">
+            <li>
+              <a href="admin-dashboard.html" class="admin-link hidden"
+                >Admin Dashboard</a
+              >
+            </li>
+            <li><a href="pages/items.html">Items</a></li>
           </ul>
-
           <img
             class="img-holder img-btn"
             alt="Jane Doe"
@@ -62,13 +65,21 @@
 
               <span id="line"></span>
 
-              <a href="#" class="sub-menu-link">
+              <a href="pages/items.html" class="sub-menu-link mobile-only">
+                <i class="fa-solid fa-list"></i>
+                <p>Items</p>
+                <span>></span>
+              </a>
+
+              <span id="line"></span>
+
+              <a href="pages/lost-items.html" class="sub-menu-link">
                 <i class="fa-solid fa-circle-plus fill"></i>
                 <p>Post Lost Item</p>
                 <span>></span>
               </a>
 
-              <a href="#" class="sub-menu-link">
+              <a href="pages/found-items.html" class="sub-menu-link">
                 <i class="fa-solid fa-circle-plus fill"></i>
                 <p>Post Found Item</p>
                 <span>></span>
@@ -82,7 +93,7 @@
                 <span>></span>
               </a>
 
-              <a href="#" class="sub-menu-link">
+              <a href="pages/my-listings.html" class="sub-menu-link">
                 <i class="fa-solid fa-list-squares"></i>
                 <p>My Listings</p>
                 <span>></span>
@@ -90,10 +101,9 @@
 
               <a
                 href="admin-login.html"
-                class="sub-menu-link admin-link"
-                style="display: none"
+                class="sub-menu-link admin-link hidden"
               >
-                <i class="fa-solid fa-shield-alt"></i>
+                <i class="fa-solid fa-shield-halved"></i>
                 <p>Admin Panel</p>
                 <span>></span>
               </a>

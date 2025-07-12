@@ -63,12 +63,14 @@ header {
 }
 
 .menu_container {
-    width: 25%;
+    width: auto;
+    min-width: 25%;
     max-height: 3rem;
     display: flex;
-    gap: 1rem;
-    justify-content: end;
+    gap: 4rem;
+    justify-content: flex-end;
     align-items: center;
+    flex-wrap: nowrap;
 }
 
 .menu_container .img-btn {
@@ -123,12 +125,12 @@ header {
     width: 4.3rem;
     padding: .3rem;
     margin-right: 0.1rem;
-    background: var(--primary-color);
+    background: transparent;
     border-radius: 5%;
 }
 
 .menu_container ul li:hover {
-    background: var(--bg-color);
+    background: transparent;
     transition: transform 0.4s;
 }
 
@@ -397,6 +399,273 @@ select {
 }
 
 
+/* Logo SVG Styling */
+.logo_container svg {
+    stroke: #ffb833;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Logo text styling */
+.logo_container h3 {
+    color: var(--primary-color);
+}
+
+/* Navigation Links */
+.nav-links {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0.75rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.nav-links li {
+    margin: 0;
+    background: transparent;
+}
+
+.nav-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--background);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #ffa500 100%);
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 3px 12px rgba(255, 184, 51, 0.3);
+    text-align: center;
+    white-space: nowrap;
+    min-width: 120px;
+    height: 40px;
+}
+
+.nav-links a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.nav-links a:hover {
+    background: linear-gradient(135deg, #ffa500 0%, var(--primary-color) 100%);
+    color: var(--background);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 184, 51, 0.5);
+    border-color: #ffa500;
+}
+
+.nav-links a:hover::before {
+    left: 100%;
+}
+
+.nav-links a.active {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #ffa500 100%);
+    color: var(--background);
+    box-shadow: 0 4px 15px rgba(255, 184, 51, 0.4);
+    border-color: var(--primary-color);
+    transform: scale(1.02);
+}
+
+.nav-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background: var(--background);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+/* Mobile-only sub-menu links */
+.mobile-only {
+    display: flex;
+}
+
+/* Additional styles for dynamic content */
+.loading-message {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+.no-items-message {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  grid-column: 1 / -1;
+}
+
+.error-message {
+  text-align: center;
+  padding: 2rem;
+  color: #d32f2f;
+  grid-column: 1 / -1;
+}
+
+.error-message button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error-message button:hover {
+  background-color: #d32f2f;
+}
+
+/* Category button styles */
+.documents-btn {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.jewelry-btn {
+  background-color: #9C27B0;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.clothing-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.other-btn {
+  background-color: #607D8B;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+/* Grid responsive improvements */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.grid-inner img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Loading and error states */
+.loading-message,
+.no-items-message,
+.error-message {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* See More link styling */
+.see-more-link {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--primary-color);
+  color: var(--background);
+  text-decoration: none;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 184, 51, 0.3);
+}
+
+.see-more-link:hover {
+  background-color: var(--bg-color);
+  color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 184, 51, 0.4);
+}
+
+/* Responsive behavior */
+@media (min-width: 768px) {
+    .menu_container .nav-links {
+        display: flex;
+    }
+    
+    .mobile-only {
+        display: none;
+    }
+    
+    .nav-links a {
+        font-size: 0.9rem;
+        padding: 0.7rem 1.4rem;
+        min-width: 130px;
+        height: 42px;
+    }
+    
+    .menu_container {
+        width: auto;
+        min-width: 30%;
+        gap: 4.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .nav-links {
+        gap: 1rem;
+    }
+    
+    .nav-links a {
+        font-size: 1rem;
+        padding: 0.8rem 1.6rem;
+        min-width: 140px;
+        height: 44px;
+    }
+    
+    .nav-links a:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(255, 184, 51, 0.6);
+    }
+    
+    .menu_container {
+        min-width: 35%;
+        gap: 5rem;
+    }
+}
+
 /* Tablet styles */
 @media (min-width: 768px) {
     .report {
@@ -441,9 +710,6 @@ select {
         justify-content: center;
     }
 
-    .grid-inner {
-        width: calc(50% - 1rem);
-    }
 
     .recently-lost-items h2 {
         font-size: 1.8rem;
@@ -500,10 +766,6 @@ select {
     .grid {
         flex-direction: row;
         flex-wrap: nowrap;
-    }
-
-    .grid-inner {
-        width: calc(33.333% - 1rem);
     }
 
     .recently-lost-items {
@@ -876,4 +1138,23 @@ body {
 .alert-error {
     display: flex;
     align-items: center;
-    gap: 8px; }
+    gap: 8px;
+}
+
+/*
+=====================================
+HEADER STYLING
+=====================================
+This section contains all header-related styles for the application:
+- Header container and layout
+- Logo container and SVG styling
+- Menu container and navigation
+- User profile dropdown and sub-menu
+- Admin link visibility controls
+- Hidden navigation utility classes
+- Responsive header behaviors
+
+All header styles are centralized here for consistency
+across all pages in the application.
+=====================================
+*/

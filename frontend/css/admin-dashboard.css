@@ -76,6 +76,38 @@
     border-left-color: var(--primary-color);
 }
 
+/* Main Site Link Styling */
+.main-site-link {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 0.5rem;
+    padding-top: 1rem !important;
+    position: relative;
+}
+
+.main-site-link::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    opacity: 0.7;
+}
+
+.main-site-link:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.2);
+}
+
+.main-site-link:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--primary-color);
+    border-left-color: var(--primary-color);
+}
+
 .sidebar-footer {
     padding: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -111,7 +143,7 @@
 /* Header */
 .admin-header {
     background-color: var(--card-bg);
-    padding: 1rem 1.5rem;
+    padding: 0 1.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     justify-content: space-between;
@@ -750,18 +782,62 @@
 }
 
 .modal-content {
-    background-color: var(--card-bg);
+    background-color: var(--card-bg) !important;
     border-radius: 8px;
     width: 90%;
     max-width: 500px;
     max-height: 80vh;
     overflow-y: auto;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fff;
+    color: #fff !important;
     position: relative;
     margin: auto;
 }
 
+.modal-content p {
+  color: #fff;
+}
+
+.modal-content small {
+  color: var(--border-color);
+}
+
+.modal-content ul {
+  color: var(--border-color);
+}
+
+.modal-content li {
+  color: #fff;
+}
+
+.modal-content label {
+  color: #fff;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  color: #fff;
+  background-color: #2d1f0f;
+}
+
+.modal-content .user-details-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.modal-content .user-actions-section {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-content .user-details-section {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Modal Header and Footer */
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -789,10 +865,60 @@
 
 .modal-body {
     padding: 1.5rem;
+    background-color: var(--card-bg);
+}
+
+/* Comprehensive Modal Color Scheme to Match Admin Dashboard */
+.modal-content {
+    background-color: var(--card-bg);
+    color: #fff;
+}
+
+.modal-header {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-body {
+    background-color: var(--card-bg);
+}
+
+.modal-content .form-actions {
+    background-color: var(--card-bg);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Ensure all modal backgrounds match admin dashboard */
+.modal .modal-content * {
+    background-color: inherit;
+}
+
+.modal-content .user-management-container {
+    background-color: transparent;
+}
+
+.modal-content .user-management-container > div {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* File input styling to match admin dashboard */
+.form-group input[type="file"] {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.form-group input[type="file"]:focus {
+    border-color: var(--primary-color);
+    background-color: rgba(255, 193, 7, 0.1) !important;
 }
 
 /* Additional Modal Text Styling */
 .modal-content {
+  color: #fff;
+}
+
+.modal-content p {
   color: #fff;
 }
 
@@ -806,6 +932,31 @@
 
 .modal-content li {
   color: #fff;
+}
+
+.modal-content label {
+  color: #fff;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  color: #fff;
+  background-color: #2d1f0f;
+}
+
+.modal-content .user-details-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.modal-content .user-info-item {
+  color: #fff;
+}
+
+.modal-content .user-info-item strong {
+  color: var(--primary-color);
 }
 
 .password-requirements {
@@ -841,15 +992,16 @@
 
 .user-details-section,
 .user-actions-section {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.05) !important;
     border-radius: 8px;
     padding: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
 }
 
 .user-details-section h4,
 .user-actions-section h4 {
-    color: var(--primary-color);
+    color: var(--primary-color) !important;
     margin: 0 0 1rem 0;
     font-size: 1.1rem;
     display: flex;
@@ -882,12 +1034,12 @@
 
 /* Enhanced User Details Card */
 .user-details-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 8px;
     padding: 20px;
     margin-top: 10px;
-    color: #fff;
+    color: #fff !important;
 }
 
 .user-info-item {
@@ -895,8 +1047,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
 }
 
 .user-info-item:last-child {
@@ -904,7 +1056,7 @@
 }
 
 .user-info-item strong {
-    color: var(--primary-color);
+    color: var(--primary-color) !important;
     font-weight: 600;
     min-width: 80px;
 }
@@ -991,8 +1143,8 @@
     }
 }
 
-    /* Modal Responsive Design */
-    .modal-content {
+/* Modal Responsive Design */
+.modal-content {
         width: 95%;
         max-width: 95%;
         padding: 15px;
@@ -1059,7 +1211,6 @@
         min-width: auto;
         font-size: 0.9rem;
     }
-}
 
 @media (max-width: 480px) {
     .modal-content {
@@ -1126,7 +1277,6 @@
     margin-top: 0.25rem;
     color: #999;
     font-size: 0.8rem;
-    font-style: italic;
 }
 
 .form-group input[type="file"] {
@@ -1241,7 +1391,7 @@
 
 #delete-user-modal .modal-body p {
     margin-bottom: 1rem;
-    color: var(--text-color);
+    color: #fff;
 }
 
 #delete-user-modal .modal-body p strong {
@@ -1250,11 +1400,12 @@
 
 #delete-user-modal .user-info {
     text-align: left;
-    background: rgba(248, 249, 250, 0.1);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     padding: 1rem;
     margin: 1rem 0;
+    color: #fff;
 }
 
 #delete-user-modal .user-info strong {
@@ -1279,4 +1430,154 @@
     border-radius: 4px;
     font-size: 0.875rem;
     font-weight: 500;
+}
+
+/* Form Help Text Styling */
+.form-help {
+    color: #aaa;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Modal Content Contrast Fixes */
+.modal-content .warning-icon {
+    color: #ff6b6b;
+}
+
+.modal-content .warning-icon .fas {
+    color: #ff6b6b;
+}
+
+/* Ensure all modal text is readable */
+.modal-content * {
+    color: inherit;
+}
+
+.modal-content .text-muted {
+    color: #aaa !important;
+}
+
+/* Fix any inherited light backgrounds */
+.modal-content .bg-light {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+}
+
+/* Modal Input Fields Admin Dashboard Color Scheme */
+.modal input,
+.modal textarea,
+.modal select {
+  background-color: var(--card-bg) !important;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  background-color: var(--card-bg) !important;
+}
+
+/* Admin Dashboard Modal Color Overrides - Override components.css */
+.admin-container .modal-content {
+    background: var(--card-bg) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.admin-container .modal-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+}
+
+.admin-container .modal-header h2,
+.admin-container .modal-header h3 {
+    color: var(--primary-color) !important;
+}
+
+.admin-container .modal-close {
+    color: #fff !important;
+    background: transparent !important;
+}
+
+.admin-container .modal-close:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.admin-container .modal-body {
+    background: transparent !important;
+    color: #fff !important;
+}
+
+.admin-container .modal .form-group label {
+    color: #fff !important;
+}
+
+.admin-container .modal .form-group input,
+.admin-container .modal .form-group textarea,
+.admin-container .modal .form-group select {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+}
+
+.admin-container .modal .form-group input:focus,
+.admin-container .modal .form-group textarea:focus,
+.admin-container .modal .form-group select:focus {
+    border-color: var(--primary-color) !important;
+    background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+.admin-container .modal .form-actions {
+    background: transparent !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.admin-container .modal p {
+    color: #fff !important;
+}
+
+.admin-container .modal small {
+    color: var(--border-color) !important;
+}
+
+.admin-container .modal ul,
+.admin-container .modal li {
+    color: #fff !important;
+}
+
+.admin-container .modal .password-requirements {
+    color: var(--border-color) !important;
+}
+
+.admin-container .modal .password-requirements small,
+.admin-container .modal .password-requirements ul,
+.admin-container .modal .password-requirements li {
+    color: var(--border-color) !important;
+}
+
+.admin-container .modal .user-info {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.admin-container .modal .user-details-card {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.admin-container .modal .user-info-item {
+    color: #fff !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.admin-container .modal .user-info-item strong {
+    color: var(--primary-color) !important;
+}
+
+.admin-container .modal .warning-icon {
+    color: #ff6b6b !important;
+}
+
+.admin-container .modal .form-help {
+    color: var(--border-color) !important;
 }

@@ -40,7 +40,7 @@ app.use(morgan('dev')); // HTTP request logger
 app.use('/public', express.static('public')); // This means: anything in 'public' folder will be available under /public URL path
 
 // Serve frontend files
-app.use('/', express.static('../frontend'));
+app.use('/', express.static('../'));
 
 // Routes (will be imported later)
 app.get('/', (req, res) => {

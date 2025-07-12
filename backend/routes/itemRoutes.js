@@ -1,6 +1,10 @@
 const express = require('express');
 const itemController = require('../controllers/itemController');
-const { protect, authorize } = require('../middlewares/authMiddleware');
+const {
+  protect,
+  authorize,
+  optionalAuth,
+} = require('../middlewares/authMiddleware');
 const { uploadItemImage } = require('../middlewares/uploadMiddleware'); // For image uploads
 const {
   itemValidation,
@@ -11,7 +15,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(itemController.getAllItems) // Publicly accessible to view
+  .get(optionalAuth, itemController.getAllItems) // Optional auth to support "my" parameter
   .post(
     protect,
     uploadItemImage,

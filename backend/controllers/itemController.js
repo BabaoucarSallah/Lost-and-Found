@@ -38,7 +38,15 @@ exports.createItem = catchAsync(async (req, res, next) => {
 // Get all lost/found items with search and filter
 exports.getAllItems = catchAsync(async (req, res, next) => {
   const queryObj = { ...req.query };
-  const excludedFields = ['page', 'sort', 'limit', 'fields', 'keyword'];
+  const excludedFields = [
+    'page',
+    'sort',
+    'limit',
+    'fields',
+    'keyword',
+    'my',
+    'location',
+  ];
   excludedFields.forEach((el) => delete queryObj[el]);
 
   // Build query
@@ -49,6 +57,13 @@ exports.getAllItems = catchAsync(async (req, res, next) => {
   if (queryObj.category)
     query = query.where('category').equals(queryObj.category);
   if (queryObj.status) query = query.where('status').equals(queryObj.status);
+
+  // Filter by current user's items
+  if (req.query.my === 'true' && req.user) {
+    query = query.where('user').equals(req.user.id);
+  }
+
+  // Date range filtering
   if (queryObj.date_lost_or_found_gte)
     query = query
       .where('date_lost_or_found')
@@ -58,10 +73,25 @@ exports.getAllItems = catchAsync(async (req, res, next) => {
       .where('date_lost_or_found')
       .lte(new Date(queryObj.date_lost_or_found_lte));
 
-  // Keyword search (text index search)
-  if (req.query.keyword) {
-    query = query.where({ $text: { $search: req.query.keyword } });
+  // Location search (case-insensitive partial match)
+  if (req.query.location) {
+    query = query.where('location').regex(new RegExp(req.query.location, 'i'));
   }
+
+  // Keyword search - search in title, description, and location
+  if (req.query.keyword) {
+    const searchRegex = new RegExp(req.query.keyword, 'i');
+    query = query.where({
+      $or: [
+        { title: searchRegex },
+        { description: searchRegex },
+        { location: searchRegex },
+      ],
+    });
+  }
+
+  // Build count query for pagination (before applying pagination)
+  const countQuery = query.clone();
 
   // Sorting
   if (req.query.sort) {
@@ -86,10 +116,13 @@ exports.getAllItems = catchAsync(async (req, res, next) => {
 
   query = query.skip(skip).limit(limit);
 
-  const items = await query
-    .populate('user', 'username email contact_info')
-    .populate('category', 'name');
-  const totalItems = await Item.countDocuments(queryObj); // Count without pagination
+  // Execute queries
+  const [items, totalItems] = await Promise.all([
+    query
+      .populate('user', 'username email contact_info')
+      .populate('category', 'name'),
+    countQuery.countDocuments(),
+  ]);
 
   res.status(200).json({
     status: 'success',

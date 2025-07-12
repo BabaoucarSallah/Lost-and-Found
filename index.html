@@ -39,102 +39,78 @@
           </a>
         </div>
 
-        <nav id="auth-container">
-          <ul>
-            <li><a href="./frontend/login.html" target="_blank">Login</a></li>
-            <li><a href="./frontend/register.html" target="_blank">Register</a></li>
-          </ul>
-        </nav>
+        <nav id="auth-container"></nav>
       </div>
     </header>
 
-
     <section class="report">
       <div class="insider">
-        <h1>Reuniting People <br> with Their Belongings</h1>
+        <h1>
+          Reuniting People <br />
+          with Their Belongings
+        </h1>
         <p>
-          Our community helps return lost items to <br> their owners
-          through a simple and secure <br> platform
+          Our community helps return lost items to <br />
+          their owners through a simple and secure <br />
+          platform
         </p>
       </div>
       <div class="report-btn">
         <button class="lost-item-btn">
-          <a href="./frontend/pages/lost-items.html" target="_blank">
-            Report Lost Item
-          </a>
+          <a href="./frontend/pages/lost-items.html"> Report Lost Item </a>
         </button>
         <button class="found-item-btn">
-          <a href="./frontend/pages/found-items.html" target="_blank">
-            Report Found Item
-          </a>
+          <a href="./frontend/pages/found-items.html"> Report Found Item </a>
         </button>
       </div>
     </section>
 
     <section class="search">
       <div class="search-items">
-        <h2>
-          Search Items
-        </h2>
-        <hr class="sea"><br><br>
-        <input type="text" name="search" placeholder="Search by keyword"><br><br>
-        <select name="categories" id="all-categories">
-          <option value="all-categories">All Categories</option>
-          <option value="Electronics"> Electronics</option>
+        <h2>Search Items</h2>
+        <hr class="sea" />
+        <br /><br />
+        <input
+          type="text"
+          id="search-keyword"
+          name="search"
+          placeholder="Search by keyword"
+        /><br /><br />
+        <select name="categories" id="search-categories">
+          <option value="">All Categories</option>
+          <option value="Electronics">Electronics</option>
           <option value="Documents">Documents</option>
           <option value="Jewelry">Jewelry</option>
           <option value="Clothing">Clothing</option>
-          <option value="Other">Other</option>
-        </select><br><br>
-        <input type="text" name="location" placeholder="location"><br><br>
-        <button class="search-btn">
-          <a href="#">Search</a>
-        </button>
+          <option value="Other">Other</option></select
+        ><br /><br />
+        <input
+          type="text"
+          id="search-location"
+          name="location"
+          placeholder="Location"
+        /><br /><br />
+        <select id="search-type" name="type">
+          <option value="">All Types</option>
+          <option value="lost">Lost Items</option>
+          <option value="found">Found Items</option></select
+        ><br /><br />
+        <button class="search-btn" onclick="performSearch()">Search</button>
       </div>
     </section>
 
-    
-
+    <main>
       <section class="recently-lost-items">
         <h2>Recently Lost Items</h2>
         <hr class="sea" />
         <br /><br />
-        <div class="grid">
-          <div class="grid-inner">
-            <img src="#" alt="iphone 13 Pro" />
-            <h3>iPhone 13 Pro</h3>
-            <button class="electronics-btn">Electronics</button>
-            <p>Hospital,Koina</p>
-            <p>Lost on June 15, 2023</p>
-            <button class="lost-btn">Lost</button><br /><br />
-            <button class="owner-btn">
-              <a href="#"> Contact Owner </a>
-            </button>
-          </div>
-
-          <div class="grid-inner">
-            <img src="#" alt="school-bag" />
-            <h3>School Bag</h3>
-            <button class="electronics-btn">Clothing</button>
-            <p>Garrage,Brikama</p>
-            <p>Lost on August 23, 2024</p>
-            <button class="lost-btn">Lost</button><br /><br />
-            <button class="owner-btn">
-              <a href="#"> Contact Owner </a>
-            </button>
-          </div>
-
-          <div class="grid-inner">
-            <img src="#" alt="wrist-watch" />
-            <h3>Wrist Watch</h3>
-            <button class="electronics-btn">Electronics</button>
-            <p>School Campus,Basse</p>
-            <p>Lost on February 17, 2025</p>
-            <button class="lost-btn">Lost</button><br /><br />
-            <button class="owner-btn">
-              <a href="#"> Contact Owner </a>
-            </button>
-          </div>
+        <div class="grid" id="lost-items-container">
+          <!-- Lost items will be populated here -->
+          <div class="loading-message">Loading lost items...</div>
+        </div>
+        <br />
+        <div style="text-align: center; margin-top: 1rem">
+          <a href="./frontend/items.html" class="see-more-link">See More</a>
         </div>
       </section>
 
@@ -142,42 +118,13 @@
         <h2>Recently Found Items</h2>
         <hr class="sea" />
         <br /><br />
-        <div class="grid">
-          <div class="grid-inner">
-            <img src="#" alt="iphone 13 Pro" />
-            <h3>iPhone 13 Pro</h3>
-            <button class="electronics-btn">Electronics</button>
-            <p>Hospital,Koina</p>
-            <p>Found on June 15, 2023</p>
-            <button class="found-btn">Found</button><br /><br />
-            <button class="owner-btn">
-              <a href="#"> Contact Owner </a>
-            </button>
-          </div>
-
-          <div class="grid-inner">
-            <img src="#" alt="school-bag" />
-            <h3>School Bag</h3>
-            <button class="electronics-btn">Clothing</button>
-            <p>Garrage,Brikama</p>
-            <p>Found on August 23, 2024</p>
-            <button class="found-btn">Found</button><br /><br />
-            <button class="owner-btn">
-              <a href="#"> Contact Owner </a>
-            </button>
-          </div>
-
-          <div class="grid-inner">
-            <img src="#" alt="wrist-watch" />
-            <h3>Wrist Watch</h3>
-            <button class="electronics-btn">Electronics</button>
-            <p>School Campus,Basse</p>
-            <p>Found on February 17, 2025</p>
-            <button class="found-btn">Found</button><br /><br />
-            <button class="owner-btn">
-              <a href="#"> Contact Owner </a>
-            </button>
-          </div>
+        <div class="grid" id="found-items-container">
+          <!-- Found items will be populated here -->
+          <div class="loading-message">Loading found items...</div>
+        </div>
+        <br />
+        <div style="text-align: center; margin-top: 1rem">
+          <a href="./frontend/items.html" class="see-more-link">See More</a>
         </div>
       </section>
     </main>

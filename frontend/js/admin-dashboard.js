@@ -16,9 +16,14 @@ class AdminDashboard {
   }
 
   init() {
-    this.checkAuth();
-    this.setupEventListeners();
-    this.loadDashboard();
+    try {
+      this.checkAuth();
+      this.setupEventListeners();
+      this.loadDashboard();
+      console.log('Admin dashboard initialized successfully');
+    } catch (error) {
+      console.error('Error initializing admin dashboard:', error);
+    }
   }
 
   checkAuth() {
@@ -64,20 +69,54 @@ class AdminDashboard {
   }
 
   setupEventListeners() {
-    // Navigation links
-    document.querySelectorAll('.nav-link').forEach((link) => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const section = e.target.getAttribute('data-section');
-        this.showSection(section);
-      });
-    });
+    try {
+      // Navigation links
+      const navLinks = document.querySelectorAll('.nav-link');
+      console.log(`Found ${navLinks.length} navigation links`);
 
-    // Category form
-    document.getElementById('category-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.handleCategorySubmit();
-    });
+      navLinks.forEach((link) => {
+        link.addEventListener('click', (e) => {
+          // Check if it's the main site link first, before preventing default
+          if (e.currentTarget.classList.contains('main-site-link')) {
+            // The onclick handler will handle main site navigation
+            console.log('Main site link clicked - handled by onclick');
+            return;
+          }
+
+          // Only prevent default for admin dashboard navigation
+          e.preventDefault();
+
+          // Get section from current target or target
+          let section = e.currentTarget.getAttribute('data-section');
+          if (!section) {
+            section = e.target.getAttribute('data-section');
+          }
+
+          if (section) {
+            console.log(`Navigating to section: ${section}`);
+            this.showSection(section);
+          } else {
+            console.error(
+              'Navigation link missing data-section attribute',
+              e.currentTarget
+            );
+          }
+        });
+      });
+
+      // Category form
+      const categoryForm = document.getElementById('category-form');
+      if (categoryForm) {
+        categoryForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleCategorySubmit();
+        });
+      } else {
+        console.warn('Category form not found');
+      }
+    } catch (error) {
+      console.error('Error setting up event listeners:', error);
+    }
 
     // Add Item form
     document.getElementById('add-item-form').addEventListener('submit', (e) => {
@@ -187,21 +226,41 @@ class AdminDashboard {
   }
 
   showSection(sectionName) {
+    // Validate sectionName
+    if (!sectionName) {
+      console.error('showSection: sectionName is required');
+      return;
+    }
+
     // Hide all sections
     document.querySelectorAll('.content-section').forEach((section) => {
       section.classList.remove('active');
     });
 
     // Show selected section
-    document.getElementById(sectionName).classList.add('active');
+    const targetSection = document.getElementById(sectionName);
+    if (targetSection) {
+      targetSection.classList.add('active');
+    } else {
+      console.error(
+        `showSection: Section element with id "${sectionName}" not found`
+      );
+      return;
+    }
 
     // Update navigation
     document.querySelectorAll('.nav-link').forEach((link) => {
       link.classList.remove('active');
     });
-    document
-      .querySelector(`[data-section="${sectionName}"]`)
-      .classList.add('active');
+
+    const navLink = document.querySelector(`[data-section="${sectionName}"]`);
+    if (navLink) {
+      navLink.classList.add('active');
+    } else {
+      console.warn(
+        `showSection: Navigation link for section "${sectionName}" not found`
+      );
+    }
 
     // Update page title
     const titles = {
@@ -212,10 +271,31 @@ class AdminDashboard {
       claims: 'Claims Management',
       messages: 'Messages Management',
     };
-    document.getElementById('page-title').textContent = titles[sectionName];
+
+    const pageTitle = document.getElementById('page-title');
+    if (pageTitle && titles[sectionName]) {
+      pageTitle.textContent = titles[sectionName];
+    }
 
     // Load section data
     this.loadSectionData(sectionName);
+  }
+
+  // Method to navigate to a section (used by onclick handlers)
+  navigateToSection(sectionName, filter = null) {
+    this.showSection(sectionName);
+
+    // Apply filter if provided
+    if (filter && sectionName === 'items') {
+      const filterSelect = document.getElementById('item-type-filter');
+      if (filterSelect) {
+        filterSelect.value = filter;
+        // Trigger the filter function if it exists
+        if (typeof filterItems === 'function') {
+          filterItems();
+        }
+      }
+    }
   }
 
   async loadSectionData(section) {
@@ -270,14 +350,16 @@ class AdminDashboard {
         this.stats.lostItems = stats.lostItems || 0;
         this.stats.foundItems = stats.foundItems || 0;
 
-        document.getElementById('total-users').textContent =
-          this.stats.totalUsers;
-        document.getElementById('total-items').textContent =
-          this.stats.totalItems;
-        document.getElementById('lost-items').textContent =
-          this.stats.lostItems;
-        document.getElementById('found-items').textContent =
-          this.stats.foundItems;
+        // Update stat elements with error handling
+        const totalUsersEl = document.getElementById('total-users');
+        const totalItemsEl = document.getElementById('total-items');
+        const lostItemsEl = document.getElementById('lost-items');
+        const foundItemsEl = document.getElementById('found-items');
+
+        if (totalUsersEl) totalUsersEl.textContent = this.stats.totalUsers;
+        if (totalItemsEl) totalItemsEl.textContent = this.stats.totalItems;
+        if (lostItemsEl) lostItemsEl.textContent = this.stats.lostItems;
+        if (foundItemsEl) foundItemsEl.textContent = this.stats.foundItems;
 
         // Display recent activity
         if (data.data.recentActivity) {
@@ -291,6 +373,12 @@ class AdminDashboard {
 
   displayRecentActivity(items) {
     const container = document.getElementById('recent-activity-list');
+
+    if (!container) {
+      console.error('Recent activity container not found');
+      return;
+    }
+
     container.innerHTML = '';
 
     if (!items || items.length === 0) {
@@ -417,7 +505,10 @@ class AdminDashboard {
       }" 
                          alt="${item.title}" 
                          class="item-image"
-                         onerror="this.src='img/100x100.png'">
+                         onerror="this.src='${this.baseURL.replace(
+                           '/api/v1',
+                           ''
+                         )}/frontend/img/100x100.png'">
                 </td>
                 <td data-label="Title">${item.title}</td>
                 <td data-label="Type"><span class="status-badge status-${
@@ -751,7 +842,10 @@ class AdminDashboard {
     }" 
                              alt="${item.title}" 
                              style="width: 100%; max-width: 300px; border-radius: 8px;"
-                             onerror="this.src='img/100x100.png'">
+                             onerror="this.src='${this.baseURL.replace(
+                               '/api/v1',
+                               ''
+                             )}/frontend/img/100x100.png'">
                     </div>
                     <div class="col-md-6">
                         <h4>${item.title}</h4>
@@ -2416,7 +2510,19 @@ function closeEditClaimModal() {
 let adminDashboard;
 document.addEventListener('DOMContentLoaded', () => {
   adminDashboard = new AdminDashboard();
+
+  // Make navigation method available globally for onclick handlers
+  window.adminDashboard = adminDashboard;
 });
+
+// Global navigation function for onclick handlers
+window.navigateToSection = function (sectionName, filter = null) {
+  if (window.adminDashboard) {
+    window.adminDashboard.navigateToSection(sectionName, filter);
+  } else {
+    console.error('Admin dashboard not initialized');
+  }
+};
 
 // Item details modal functions
 AdminDashboard.prototype.viewItemDetails = async function (itemId) {
@@ -2508,7 +2614,10 @@ AdminDashboard.prototype.showItemDetailsModal = function (item) {
   }" 
                      alt="${item.title}" 
                      style="max-width: 100%; max-height: 300px; border-radius: 8px; object-fit: cover;"
-                     onerror="this.src='img/100x100.png'">
+                     onerror="this.src='${this.baseURL.replace(
+                       '/api/v1',
+                       ''
+                     )}/frontend/img/100x100.png'">
               </div>
               <h4><i class="fas fa-cogs"></i> Quick Actions</h4>
               <div class="action-buttons">
@@ -2537,4 +2646,11 @@ AdminDashboard.prototype.closeItemDetailsModal = function () {
   if (modal) {
     modal.remove();
   }
+};
+
+// Global function to navigate to main site
+window.goToMainSite = function () {
+  console.log('Navigating to main site in same tab');
+  // Navigate to main site in the same tab
+  window.location.href = './index.html';
 };
